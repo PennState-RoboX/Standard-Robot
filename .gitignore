@@ -8,3 +8,5 @@
 *.lnp
 *.sct
 *.lst
+
+/MDK-ARM/*
