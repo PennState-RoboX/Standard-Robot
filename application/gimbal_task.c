@@ -26,6 +26,7 @@
   */
 
 #include "gimbal_task.h"
+#include "referee_usart_task.h"
 
 #include "main.h"
 
@@ -400,7 +401,7 @@ void gimbal_task(void const *pvParameters)
   */
 void set_cali_gimbal_hook(const uint16_t yaw_offset, const uint16_t pitch_offset, const fp32 max_yaw, const fp32 min_yaw, const fp32 max_pitch, const fp32 min_pitch)
 {
-    gimbal_control.gimbal_yaw_motor.offset_ecd = yaw_offset;
+    gimbal_control.gimbal_yaw_motor.offset_ecd = 0x058d;
     gimbal_control.gimbal_yaw_motor.max_relative_angle = max_yaw;
     gimbal_control.gimbal_yaw_motor.min_relative_angle = min_yaw;
 
@@ -869,6 +870,15 @@ static void gimbal_set_control(gimbal_control_t *set_control)
         gimbal_relative_angle_limit(&set_control->gimbal_pitch_motor, add_pitch_angle);
     }
 }
+
+
+
+
+
+
+
+
+
 /**
   * @brief          gimbal control mode :GIMBAL_MOTOR_GYRO, use euler angle calculated by gyro sensor to control. 
   * @param[out]     gimbal_motor: yaw motor or pitch motor
@@ -929,15 +939,15 @@ static void gimbal_relative_angle_limit(gimbal_motor_t *gimbal_motor, fp32 add)
         return;
     }
     gimbal_motor->relative_angle_set += add;
-    //是否超过最大 最小值
-    if (gimbal_motor->relative_angle_set > gimbal_motor->max_relative_angle)
-    {
-        gimbal_motor->relative_angle_set = gimbal_motor->max_relative_angle;
-    }
-    else if (gimbal_motor->relative_angle_set < gimbal_motor->min_relative_angle)
-    {
-        gimbal_motor->relative_angle_set = gimbal_motor->min_relative_angle;
-    }
+//    //是否超过最大 最小值
+//    if (gimbal_motor->relative_angle_set > gimbal_motor->max_relative_angle)
+//    {
+//        gimbal_motor->relative_angle_set = gimbal_motor->max_relative_angle;
+//    }
+//    else if (gimbal_motor->relative_angle_set < gimbal_motor->min_relative_angle)
+//    {
+//        gimbal_motor->relative_angle_set = gimbal_motor->min_relative_angle;
+//    }
 }
 
 
@@ -969,7 +979,10 @@ static void gimbal_control_loop(gimbal_control_t *control_loop)
     }
     else if (control_loop->gimbal_yaw_motor.gimbal_motor_mode == GIMBAL_MOTOR_ENCONDE)
     {
-        gimbal_motor_relative_angle_control(&control_loop->gimbal_yaw_motor);
+			control_loop->gimbal_yaw_motor.motor_gyro_set = gimbal_PID_calc(&control_loop->gimbal_yaw_motor.gimbal_motor_absolute_angle_pid, cv_Data.yaw, 0, control_loop->gimbal_yaw_motor.motor_gyro);
+			control_loop->gimbal_yaw_motor.current_set = PID_calc(&control_loop->gimbal_yaw_motor.gimbal_motor_gyro_pid, control_loop->gimbal_yaw_motor.motor_gyro, control_loop->gimbal_yaw_motor.motor_gyro_set);
+			//控制值赋值
+			control_loop->gimbal_yaw_motor.given_current = -(int16_t)(control_loop->gimbal_yaw_motor.current_set);
     }
 
     if (control_loop->gimbal_pitch_motor.gimbal_motor_mode == GIMBAL_MOTOR_RAW)
@@ -982,7 +995,11 @@ static void gimbal_control_loop(gimbal_control_t *control_loop)
     }
     else if (control_loop->gimbal_pitch_motor.gimbal_motor_mode == GIMBAL_MOTOR_ENCONDE)
     {
-        gimbal_motor_relative_angle_control(&control_loop->gimbal_pitch_motor);
+  
+			control_loop->gimbal_pitch_motor.motor_gyro_set = gimbal_PID_calc(&control_loop->gimbal_pitch_motor.gimbal_motor_absolute_angle_pid, cv_Data.pitch, 0, control_loop->gimbal_pitch_motor.motor_gyro);
+			control_loop->gimbal_pitch_motor.current_set = PID_calc(&control_loop->gimbal_pitch_motor.gimbal_motor_gyro_pid, control_loop->gimbal_pitch_motor.motor_gyro, control_loop->gimbal_pitch_motor.motor_gyro_set);
+			//控制值赋值
+			control_loop->gimbal_pitch_motor.given_current = (int16_t)(control_loop->gimbal_pitch_motor.current_set);
     }
 }
 
@@ -1008,6 +1025,26 @@ static void gimbal_motor_absolute_angle_control(gimbal_motor_t *gimbal_motor)
     //控制值赋值
     gimbal_motor->given_current = (int16_t)(gimbal_motor->current_set);
 }
+
+
+
+static void cv_gimbal_autorotate(gimbal_motor_t *gimbal_motor)
+{
+	  if (gimbal_motor == NULL)
+    {
+        return;
+    }
+  
+    gimbal_motor->motor_gyro_set = gimbal_PID_calc(&gimbal_motor->gimbal_motor_absolute_angle_pid, gimbal_motor->absolute_angle, gimbal_motor->absolute_angle_set, gimbal_motor->motor_gyro);
+    gimbal_motor->current_set = PID_calc(&gimbal_motor->gimbal_motor_gyro_pid, gimbal_motor->motor_gyro, gimbal_motor->motor_gyro_set);
+    //控制值赋值
+    gimbal_motor->given_current = (int16_t)(gimbal_motor->current_set);
+}
+	
+
+
+
+
 /**
   * @brief          gimbal control mode :GIMBAL_MOTOR_ENCONDE, use the encode relative angle  to control. 
   * @param[out]     gimbal_motor: yaw motor or pitch motor

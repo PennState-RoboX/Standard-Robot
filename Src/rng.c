@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2023 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under Ultimate Liberty license
@@ -68,7 +68,7 @@ void HAL_RNG_MspDeInit(RNG_HandleTypeDef* rngHandle)
 
   /* USER CODE END RNG_MspDeInit 1 */
   }
-} 
+}
 
 /* USER CODE BEGIN 1 */
 

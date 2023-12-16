@@ -556,7 +556,7 @@ static void cali_data_read(void)
         
         offset += CALI_SENSOR_HEAD_LEGHT * 4;
 
-        if (cali_sensor[i].cali_done != CALIED_FLAG && cali_sensor[i].cali_hook != NULL)
+        if (cali_sensor[i].cali_done != CALIED_FLAG && cali_sensor[i].cali_hook != NULL) //如果还没有校准，并且校准函数不为空
         {
             cali_sensor[i].cali_cmd = 1;
         }

@@ -17,6 +17,7 @@
 #include "referee_usart_task.h"
 #include "main.h"
 #include "cmsis_os.h"
+#include "INS_task.h"
 
 #include "bsp_usart.h"
 #include "detect_task.h"
@@ -49,7 +50,8 @@ uint8_t usart6_buf[2][USART_RX_BUF_LENGHT];
 fifo_s_t referee_fifo;
 uint8_t referee_fifo_buf[REFEREE_FIFO_BUF_LENGTH];
 unpack_data_t referee_unpack_obj;
-
+	char dma_buf[50];
+	char rx_data[9];
 /**
   * @brief          referee task
   * @param[in]      pvParameters: NULL
@@ -62,17 +64,50 @@ unpack_data_t referee_unpack_obj;
   */
 void referee_usart_task(void const * argument)
 {
-    init_referee_struct_data();
-    fifo_s_init(&referee_fifo, referee_fifo_buf, REFEREE_FIFO_BUF_LENGTH);
-    usart6_init(usart6_buf[0], usart6_buf[1], USART_RX_BUF_LENGHT);
 
-    while(1)
+  memset(dma_buf, 0, 200);
+	memset(rx_data, 0, 10);
+	const fp32* imu = get_INS_angle_point();
+	while(1){
+		sprintf((char *)dma_buf, "A5%f,%f,%f", imu[0],imu[1],imu[2]);
+	HAL_UART_Transmit_DMA(&huart6, (uint8_t*)dma_buf, strlen((const char*)dma_buf));
+	HAL_UART_Receive_DMA(&huart6, rx_data, 9); 
+		
+	}
+}
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+    if (huart->Instance == USART6)  
     {
-
-        referee_unpack_fifo_data();
-        osDelay(10);
+			//HAL_UART_Receive_DMA(&huart6, (uint8_t*)rx_rdata, 9);
+			HAL_UART_Transmit_DMA(&huart6, (uint8_t*)dma_buf, strlen((const char*)dma_buf));
     }
 }
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) 
+{
+	if (huart->Instance == USART6)  
+  {
+			HAL_UART_Receive_DMA(&huart6, (uint8_t*)rx_data, 9); 
+			UART7_CommandRoute();
+	}
+}
+
+cv_Data_TypeDef cv_Data;
+void UART7_CommandRoute(void){
+			//TODO: RUN AUTO AIM ROUTEIN
+			int pitch_int = rx_data[3];
+			int pitch_deci = rx_data[4];
+			int yaw_int = rx_data[5];
+			int yaw_deci = rx_data[6];
+			cv_Data.pitch = (float)(pitch_int) - 50.0 + (float)pitch_deci/100;
+			cv_Data.yaw = (float)(yaw_int) - 50.0 + (float)yaw_deci/100;
+			if (cv_Data.pitch == -50 || cv_Data.yaw == -50){
+				cv_Data.yaw = 0.0;
+				cv_Data.pitch = 0.0;
+			}
+	}
 
 
 /**

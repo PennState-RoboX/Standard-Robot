@@ -93,8 +93,8 @@ void shoot_init(void)
     PID_init(&shoot_control.trigger_motor_pid, PID_POSITION, Trigger_speed_pid, TRIGGER_READY_PID_MAX_OUT, TRIGGER_READY_PID_MAX_IOUT);
     //更新数据
     shoot_feedback_update();
-    ramp_init(&shoot_control.fric1_ramp, SHOOT_CONTROL_TIME * 0.001f, FRIC_DOWN, FRIC_OFF);
-    ramp_init(&shoot_control.fric2_ramp, SHOOT_CONTROL_TIME * 0.001f, FRIC_DOWN, FRIC_OFF);
+    ramp_init(&shoot_control.fric1_ramp, SHOOT_CONTROL_TIME * 0.001f, FRIC_UP, FRIC_OFF);
+    ramp_init(&shoot_control.fric2_ramp, SHOOT_CONTROL_TIME * 0.001f, FRIC_UP, FRIC_OFF);
     shoot_control.fric_pwm1 = FRIC_OFF;
     shoot_control.fric_pwm2 = FRIC_OFF;
     shoot_control.ecd_count = 0;
@@ -230,15 +230,11 @@ static void shoot_set_mode(void)
 
     if(shoot_control.shoot_mode == SHOOT_READY_FRIC && shoot_control.fric1_ramp.out == shoot_control.fric1_ramp.max_value && shoot_control.fric2_ramp.out == shoot_control.fric2_ramp.max_value)
     {
-        shoot_control.shoot_mode = SHOOT_READY_BULLET;
+        shoot_control.shoot_mode = SHOOT_READY;
     }
     else if(shoot_control.shoot_mode == SHOOT_READY_BULLET && shoot_control.key == SWITCH_TRIGGER_ON)
     {
         shoot_control.shoot_mode = SHOOT_READY;
-    }
-    else if(shoot_control.shoot_mode == SHOOT_READY && shoot_control.key == SWITCH_TRIGGER_OFF)
-    {
-        shoot_control.shoot_mode = SHOOT_READY_BULLET;
     }
     else if(shoot_control.shoot_mode == SHOOT_READY)
     {

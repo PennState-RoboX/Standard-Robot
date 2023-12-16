@@ -32,7 +32,7 @@
 
 #define SHOOT_CONTROL_TIME          GIMBAL_CONTROL_TIME
 
-#define SHOOT_FRIC_PWM_ADD_VALUE    100.0f
+#define SHOOT_FRIC_PWM_ADD_VALUE    400.0f
 
 //射击摩擦轮激光打开 关闭
 #define SHOOT_ON_KEYBOARD           KEY_PRESSED_OFFSET_Q
@@ -45,7 +45,7 @@
 //遥控器射击开关打下档一段时间后 连续发射子弹 用于清单
 #define RC_S_LONG_TIME              2000
 //摩擦轮高速 加速 时间
-#define UP_ADD_TIME                 80
+#define UP_ADD_TIME                 120
 //电机反馈码盘值范围
 #define HALF_ECD_RANGE              4096
 #define ECD_RANGE                   8191
@@ -54,9 +54,9 @@
 #define MOTOR_ECD_TO_ANGLE          0.000021305288720633905968306772076277f
 #define FULL_COUNT                  18
 //拨弹速度
-#define TRIGGER_SPEED               10.0f
-#define CONTINUE_TRIGGER_SPEED      15.0f
-#define READY_TRIGGER_SPEED         5.0f
+#define TRIGGER_SPEED               -10.0f
+#define CONTINUE_TRIGGER_SPEED      -15.0f
+#define READY_TRIGGER_SPEED         -5.0f
 
 #define KEY_OFF_JUGUE_TIME          500
 #define SWITCH_TRIGGER_ON           0

@@ -6,7 +6,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
+  * <h2><center>&copy; Copyright (c) 2023 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
   * This software component is licensed by ST under Ultimate Liberty license
@@ -47,9 +47,9 @@ void MX_TIM4_Init(void);
 void MX_TIM5_Init(void);
 void MX_TIM8_Init(void);
 void MX_TIM10_Init(void);
-                        
+
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
-                                                                                                                        
+
 /* USER CODE BEGIN Prototypes */
 
 /* USER CODE END Prototypes */

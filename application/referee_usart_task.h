@@ -21,6 +21,16 @@
 #define USART_RX_BUF_LENGHT     512
 #define REFEREE_FIFO_BUF_LENGTH 1024
 
+
+typedef struct
+{
+  float yaw;
+	float pitch;
+	float depth;
+	
+}cv_Data_TypeDef;
+extern cv_Data_TypeDef cv_Data;
+
 /**
   * @brief          referee task
   * @param[in]      pvParameters: NULL
@@ -32,4 +42,5 @@
   * @retval         none
   */
 extern void referee_usart_task(void const * argument);
+extern void UART7_CommandRoute(void);
 #endif
