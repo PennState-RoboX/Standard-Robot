@@ -982,7 +982,7 @@ static void gimbal_control_loop(gimbal_control_t *control_loop)
 			control_loop->gimbal_yaw_motor.motor_gyro_set = gimbal_PID_calc(&control_loop->gimbal_yaw_motor.gimbal_motor_absolute_angle_pid, cv_Data.yaw, 0, control_loop->gimbal_yaw_motor.motor_gyro);
 			control_loop->gimbal_yaw_motor.current_set = PID_calc(&control_loop->gimbal_yaw_motor.gimbal_motor_gyro_pid, control_loop->gimbal_yaw_motor.motor_gyro, control_loop->gimbal_yaw_motor.motor_gyro_set);
 			//¿ØÖÆÖµ¸³Öµ
-			control_loop->gimbal_yaw_motor.given_current = -(int16_t)(control_loop->gimbal_yaw_motor.current_set);
+			control_loop->gimbal_yaw_motor.given_current = (int16_t)(control_loop->gimbal_yaw_motor.current_set);
     }
 
     if (control_loop->gimbal_pitch_motor.gimbal_motor_mode == GIMBAL_MOTOR_RAW)
