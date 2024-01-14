@@ -89,36 +89,36 @@ void test_task(void const * argument)
   */
 static void buzzer_warn_error(uint8_t num)
 {
-    static uint8_t show_num = 0;
-    static uint8_t stop_num = 100;
-    if(show_num == 0 && stop_num == 0)
-    {
-        show_num = num;
-        stop_num = 100;
-    }
-    else if(show_num == 0)
-    {
-        stop_num--;
-        buzzer_off();
-    }
-    else
-    {
-        static uint8_t tick = 0;
-        tick++;
-        if(tick < 50)
-        {
-            buzzer_off();
-        }
-        else if(tick < 100)
-        {
-            buzzer_on(1, 30000);
-        }
-        else
-        {
-            tick = 0;
-            show_num--;
-        }
-    }
+    // static uint8_t show_num = 0;
+    // static uint8_t stop_num = 100;
+    // if(show_num == 0 && stop_num == 0)
+    // {
+    //     show_num = num;
+    //     stop_num = 100;
+    // }
+    // else if(show_num == 0)
+    // {
+    //     stop_num--;
+    //     buzzer_off();
+    // }
+    // else
+    // {
+    //     static uint8_t tick = 0;
+    //     tick++;
+    //     if(tick < 50)
+    //     {
+    //         buzzer_off();
+    //     }
+    //     else if(tick < 100)
+    //     {
+    //         buzzer_on(1, 30000);
+    //     }
+    //     else
+    //     {
+    //         tick = 0;
+    //         show_num--;
+    //     }
+    // }
 }
 
 
