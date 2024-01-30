@@ -29,6 +29,17 @@
 #include "INS_task.h"
 #include "chassis_power_control.h"
 
+/**
+  * @brief          Handle deadband for remote control input. Ignores minor joystick movements near center.
+  * @param input    Raw input value from the remote control.
+  * @param output   Processed output value. Set to zero if within deadband range.
+  * @param deadline Deadband threshold value. Initial value is 10.
+  *
+  * @brief          处理遥控器输入的死区问题。忽略摇杆中心附近的小幅移动。
+  * @param input    遥控器的原始输入值。
+  * @param output   处理后的输出值。在死区范围内时设为零。
+  * @param deadline 死区的阈值。初始值设为10。
+  */
 #define rc_deadband_limit(input, output, dealine)        \
     {                                                    \
         if ((input) > (dealine) || (input) < -(dealine)) \

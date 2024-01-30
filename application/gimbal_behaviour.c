@@ -90,20 +90,21 @@
 //当云台在校准, 设置蜂鸣器频率和强度
 #define gimbal_warn_buzzer_on() buzzer_on(31, 20000)
 #define gimbal_warn_buzzer_off() buzzer_off()
-
 #define int_abs(x) ((x) > 0 ? (x) : (-x))
+
 /**
-  * @brief          remote control dealline solve,because the value of rocker is not zero in middle place,
-  * @param          input:the raw channel value 
-  * @param          output: the processed channel value
-  * @param          deadline
+  * @brief          Handle deadband for remote control input. Ignores minor joystick movements near center.
+  * @param input    Raw input value from the remote control.
+  * @param output   Processed output value. Set to zero if within deadband range.
+  * @param deadline Deadband threshold value. Initial value is 10.
+  *
+  * @brief          处理遥控器输入的死区问题。忽略摇杆中心附近的小幅移动。
+  * @param input    遥控器的原始输入值。
+  * @param output   处理后的输出值。在死区范围内时设为零。
+  * @param deadline 死区的阈值。初始值设为10。
   */
-/**
-  * @brief          遥控器的死区判断，因为遥控器的拨杆在中位的时候，不一定为0，
-  * @param          输入的遥控器值
-  * @param          输出的死区处理后遥控器值
-  * @param          死区值
-  */
+
+
 #define rc_deadband_limit(input, output, dealine)        \
     {                                                    \
         if ((input) > (dealine) || (input) < -(dealine)) \
@@ -686,6 +687,7 @@ static void gimbal_cali_control(fp32 *yaw, fp32 *pitch, gimbal_control_t *gimbal
   */
 static void gimbal_absolute_angle_control(fp32 *yaw, fp32 *pitch, gimbal_control_t *gimbal_control_set)
 {
+    
     if (yaw == NULL || pitch == NULL || gimbal_control_set == NULL)
     {
         return;
@@ -693,8 +695,21 @@ static void gimbal_absolute_angle_control(fp32 *yaw, fp32 *pitch, gimbal_control
 
     static int16_t yaw_channel = 0, pitch_channel = 0;
 
+
+    // apply deadband to RC input, ignore small variations
+    // 死区限制，因为遥控器可能存在差异 摇杆在中间，其值不为0
+
     rc_deadband_limit(gimbal_control_set->gimbal_rc_ctrl->rc.ch[YAW_CHANNEL], yaw_channel, RC_DEADBAND);
     rc_deadband_limit(gimbal_control_set->gimbal_rc_ctrl->rc.ch[PITCH_CHANNEL], pitch_channel, RC_DEADBAND);
+
+/**    
+    Calculate yaw: 
+    - 'yaw_channel':                                     RC yaw input after deadband processing.
+    - 'YAW_RC_SEN':                                      sensitivity factor for RC input.
+    - 'gimbal_control_set->gimbal_rc_ctrl->mouse.x':     mouse x-axis movement.
+    - 'YAW_MOUSE_SEN':                                   sensitivity factor for mouse input.
+    Yaw is the sum of RC input (scaled) and mouse movement (scaled).
+*/   
 
     *yaw = yaw_channel * YAW_RC_SEN - gimbal_control_set->gimbal_rc_ctrl->mouse.x * YAW_MOUSE_SEN;
     *pitch = pitch_channel * PITCH_RC_SEN + gimbal_control_set->gimbal_rc_ctrl->mouse.y * PITCH_MOUSE_SEN;
@@ -760,9 +775,12 @@ static void gimbal_relative_angle_control(fp32 *yaw, fp32 *pitch, gimbal_control
     }
     static int16_t yaw_channel = 0, pitch_channel = 0;
 
+    //deadline, because some remote control need be calibrated,  the value of rocker is not zero in middle place,
+    //死区限制，因为遥控器可能存在差异 摇杆在中间，其值不为0
     rc_deadband_limit(gimbal_control_set->gimbal_rc_ctrl->rc.ch[YAW_CHANNEL], yaw_channel, RC_DEADBAND);
     rc_deadband_limit(gimbal_control_set->gimbal_rc_ctrl->rc.ch[PITCH_CHANNEL], pitch_channel, RC_DEADBAND);
 
+    // Recieve the yaw and pitch control value from the remote control and mouse
     *yaw = yaw_channel * YAW_RC_SEN - gimbal_control_set->gimbal_rc_ctrl->mouse.x * YAW_MOUSE_SEN;
     *pitch = pitch_channel * PITCH_RC_SEN + gimbal_control_set->gimbal_rc_ctrl->mouse.y * PITCH_MOUSE_SEN;
 

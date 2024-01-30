@@ -341,6 +341,7 @@ void gimbal_task(void const *pvParameters)
         gimbal_set_control(&gimbal_control);                 //设置云台控制量
         gimbal_control_loop(&gimbal_control);                //云台控制PID计算
         shoot_can_set_current = shoot_control_loop();        //射击任务控制循环
+
 #if YAW_TURN
         yaw_can_set_current = -gimbal_control.gimbal_yaw_motor.given_current;
 #else
@@ -401,6 +402,8 @@ void gimbal_task(void const *pvParameters)
   */
 void set_cali_gimbal_hook(const uint16_t yaw_offset, const uint16_t pitch_offset, const fp32 max_yaw, const fp32 min_yaw, const fp32 max_pitch, const fp32 min_pitch)
 {
+    // Original:
+    // gimbal_control.gimbal_yaw_motor.offset_ecd = yaw_offset;
     gimbal_control.gimbal_yaw_motor.offset_ecd = 0x058d;
     gimbal_control.gimbal_yaw_motor.max_relative_angle = max_yaw;
     gimbal_control.gimbal_yaw_motor.min_relative_angle = min_yaw;
@@ -835,8 +838,10 @@ static void gimbal_set_control(gimbal_control_t *set_control)
     fp32 add_yaw_angle = 0.0f;
     fp32 add_pitch_angle = 0.0f;
 
+    // Receive gimbal control from remote control
     gimbal_behaviour_control_set(&add_yaw_angle, &add_pitch_angle, set_control);
-    //yaw电机模式控制
+
+    // set motor control mode
     if (set_control->gimbal_yaw_motor.gimbal_motor_mode == GIMBAL_MOTOR_RAW)
     {
         //raw模式下，直接发送控制值
@@ -852,6 +857,10 @@ static void gimbal_set_control(gimbal_control_t *set_control)
         //enconde模式下，电机编码角度控制
         gimbal_relative_angle_limit(&set_control->gimbal_yaw_motor, add_yaw_angle);
     }
+
+
+    //-------------------------------------------------------------------------------------------------//
+
 
     //pitch电机模式控制
     if (set_control->gimbal_pitch_motor.gimbal_motor_mode == GIMBAL_MOTOR_RAW)
@@ -899,6 +908,7 @@ static void gimbal_absolute_angle_limit(gimbal_motor_t *gimbal_motor, fp32 add)
     }
     //now angle error
     //当前控制误差角度
+    // rad_format is to make sure the angle is between -pi and pi
     bias_angle = rad_format(gimbal_motor->absolute_angle_set - gimbal_motor->absolute_angle);
     //relative angle + angle error + add_angle > max_relative angle
     //云台相对角度+ 误差角度 + 新增角度 如果大于 最大机械角度
@@ -908,7 +918,7 @@ static void gimbal_absolute_angle_limit(gimbal_motor_t *gimbal_motor, fp32 add)
         if (add > 0.0f)
         {
             //calculate max add_angle
-            //计算出一个最大的添加角度，
+            //计算出一个最大的添加角度，add = max_relative_angle - (current_relative_angle + bias_angle)
             add = gimbal_motor->max_relative_angle - gimbal_motor->relative_angle - bias_angle;
         }
     }
@@ -919,6 +929,7 @@ static void gimbal_absolute_angle_limit(gimbal_motor_t *gimbal_motor, fp32 add)
             add = gimbal_motor->min_relative_angle - gimbal_motor->relative_angle - bias_angle;
         }
     }
+    
     angle_set = gimbal_motor->absolute_angle_set;
     gimbal_motor->absolute_angle_set = rad_format(angle_set + add);
 }
