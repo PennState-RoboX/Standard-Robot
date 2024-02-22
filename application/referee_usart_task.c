@@ -62,9 +62,30 @@ char dma_buf[50];
 // DMA data buffer for reception
 unsigned char rx_data[50];
 
-// define a complete packet
+
+/* 以下是一个完整接收数据包的格式 */
+/* 包头（a55a）：2字节 */
+/* 包长度：1字节 */
+/* ---以下是有效内容，根据需求变化--- */
+/* hex_Yaw：4字节（需要转换为IEEE 754标准的单精度浮点数） */
+/* hex_Pitch：4字节（需要转换为IEEE 754标准的单精度浮点数） */
+/* ---以上是有效内容--- */
+/* 校验和：1字节 */
+/* 包尾（ff）：1字节 */
+/* Below is the format of a complete received packet */
+/* Header (a55a): 2 bytes */
+/* Packet length: 1 byte */
+/* ---Below is the payload, subject to change as per requirements--- */
+/* hex_Yaw: 4 bytes (to be converted to IEEE 754 standard single precision floating point) */
+/* hex_Pitch: 4 bytes (to be converted to IEEE 754 standard single precision floating point) */
+/* ---Above is the payload--- */
+/* Checksum: 1 byte */
+/* Footer (ff): 1 byte */
+
 // 定义一个完整的数据包
+// define a complete packet
 uint8_t packet[CV_PACKET_LENGTH];
+
 
 /**
   * @brief          referee task
@@ -122,6 +143,7 @@ void find_CpltPacket(void){
     }
   }
 }
+
 
 cv_Data_TypeDef cv_Data;
 void UART7_CommandRoute(void){
