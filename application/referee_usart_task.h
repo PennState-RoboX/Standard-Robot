@@ -20,6 +20,7 @@
 
 #define USART_RX_BUF_LENGHT     512
 #define REFEREE_FIFO_BUF_LENGTH 1024
+#define CV_PACKET_LENGTH 13
 
 
 typedef struct
@@ -30,6 +31,13 @@ typedef struct
 	
 }cv_Data_TypeDef;
 extern cv_Data_TypeDef cv_Data;
+
+// 用于将4字节十六进制转换为float的联合体
+// Union used to convert 4-byte hexadecimal to float
+typedef union {
+    uint32_t hex;
+    float floatValue;
+} HexToFloat;
 
 /**
   * @brief          referee task
