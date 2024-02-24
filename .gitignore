@@ -8,6 +8,8 @@
 *.lnp
 *.sct
 *.lst
-
+*.uvprojx
+*.uvoptx
 /MDK-ARM/*
+.vscode/*
 

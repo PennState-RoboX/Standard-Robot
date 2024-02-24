@@ -1,3 +1,4 @@
 {
-    "files.encoding": "gbk"
+  "files.encoding": "gbk",
+  "C_Cpp_Runner.msvcBatchPath": ""
 }
