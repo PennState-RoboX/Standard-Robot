@@ -990,10 +990,17 @@ static void gimbal_control_loop(gimbal_control_t *control_loop)
     }
     else if (control_loop->gimbal_yaw_motor.gimbal_motor_mode == GIMBAL_MOTOR_ENCONDE)
     {
-			control_loop->gimbal_yaw_motor.motor_gyro_set = gimbal_PID_calc(&control_loop->gimbal_yaw_motor.gimbal_motor_absolute_angle_pid, cv_Data.yaw, 0, control_loop->gimbal_yaw_motor.motor_gyro);
-			control_loop->gimbal_yaw_motor.current_set = PID_calc(&control_loop->gimbal_yaw_motor.gimbal_motor_gyro_pid, control_loop->gimbal_yaw_motor.motor_gyro, control_loop->gimbal_yaw_motor.motor_gyro_set);
-			//控制值赋值
-			control_loop->gimbal_yaw_motor.given_current = (int16_t)(control_loop->gimbal_yaw_motor.current_set);
+      if (cv_Data.yaw==0 && cv_Data.pitch==0)
+      {
+				control_loop->gimbal_yaw_motor.given_current=0;
+      }
+      else {
+        control_loop->gimbal_yaw_motor.motor_gyro_set = gimbal_PID_calc(&control_loop->gimbal_yaw_motor.gimbal_motor_absolute_angle_pid, cv_Data.yaw, 0, control_loop->gimbal_yaw_motor.motor_gyro);
+        control_loop->gimbal_yaw_motor.current_set = PID_calc(&control_loop->gimbal_yaw_motor.gimbal_motor_gyro_pid, control_loop->gimbal_yaw_motor.motor_gyro, control_loop->gimbal_yaw_motor.motor_gyro_set);
+        //控制值赋值
+        control_loop->gimbal_yaw_motor.given_current = (int16_t)(control_loop->gimbal_yaw_motor.current_set);
+      }
+
     }
 
     if (control_loop->gimbal_pitch_motor.gimbal_motor_mode == GIMBAL_MOTOR_RAW)
@@ -1037,20 +1044,6 @@ static void gimbal_motor_absolute_angle_control(gimbal_motor_t *gimbal_motor)
     gimbal_motor->given_current = (int16_t)(gimbal_motor->current_set);
 }
 
-
-
-static void cv_gimbal_autorotate(gimbal_motor_t *gimbal_motor)
-{
-	  if (gimbal_motor == NULL)
-    {
-        return;
-    }
-  
-    gimbal_motor->motor_gyro_set = gimbal_PID_calc(&gimbal_motor->gimbal_motor_absolute_angle_pid, gimbal_motor->absolute_angle, gimbal_motor->absolute_angle_set, gimbal_motor->motor_gyro);
-    gimbal_motor->current_set = PID_calc(&gimbal_motor->gimbal_motor_gyro_pid, gimbal_motor->motor_gyro, gimbal_motor->motor_gyro_set);
-    //控制值赋值
-    gimbal_motor->given_current = (int16_t)(gimbal_motor->current_set);
-}
 	
 
 
