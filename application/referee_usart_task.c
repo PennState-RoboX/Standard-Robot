@@ -33,7 +33,7 @@
 #include "protocol.h"
 #include "referee.h"
 
-
+#include <stdbool.h> // Include this header to use bool type
 
 
 /**
@@ -131,7 +131,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 }
 
 // use to find the first complete packet from rx_data, if find A5 and come with 5A, then 
-void find_CpltPacket(void){
+bool find_CpltPacket(void){
   for (size_t i = 0; i < sizeof(rx_data); i++){
     // find A55A
     if (rx_data[i] == 0xA5 && rx_data[i+1] == 0x5A){
@@ -139,16 +139,23 @@ void find_CpltPacket(void){
       if (rx_data[i+sizeof(packet)-1] == 0xFF){
         // copy the packet
         memcpy(packet, &rx_data[i], sizeof(packet));
+				return true;
       }
     }
   }
+	return false;
 }
 
 
 cv_Data_TypeDef cv_Data;
 void UART7_CommandRoute(void){
 			// get a complete packet by checking the rx_data
-      find_CpltPacket();
+      bool packetFound = find_CpltPacket();
+
+			// If no complete packet was found, return early and skip the rest
+			if (!packetFound) {
+				return;
+			}
       
       HexToFloat yaw;
       HexToFloat pitch;
@@ -168,6 +175,9 @@ void UART7_CommandRoute(void){
                             (uint32_t)packet[10];
       pitch.hex = temp_Pitch;
       cv_Data.pitch = pitch.floatValue;
+			
+			// get Find_Target status
+			cv_Data.find_target = (char)packet[12];
 	}
 
 
