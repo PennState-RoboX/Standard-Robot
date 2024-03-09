@@ -31,10 +31,10 @@
 
 //the channel num of controlling vertial speed 
 //前后的遥控器通道号码
-#define CHASSIS_X_CHANNEL 1
+#define CHASSIS_X_CHANNEL 0
 //the channel num of controlling horizontal speed
 //左右的遥控器通道号码
-#define CHASSIS_Y_CHANNEL 0
+#define CHASSIS_Y_CHANNEL 1
 
 //in some mode, can use remote control to control rotation speed
 //在特殊模式下，可以通过遥控器控制旋转

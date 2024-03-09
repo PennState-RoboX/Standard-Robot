@@ -410,7 +410,7 @@ void chassis_rc_to_control_vector(fp32 *vx_set, fp32 *vy_set, chassis_move_t *ch
     rc_deadband_limit(chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_X_CHANNEL], vx_channel, CHASSIS_RC_DEADLINE);
     rc_deadband_limit(chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_Y_CHANNEL], vy_channel, CHASSIS_RC_DEADLINE);
 
-    vx_set_channel = vx_channel * CHASSIS_VX_RC_SEN;
+    vx_set_channel = vx_channel * -CHASSIS_VX_RC_SEN;
     vy_set_channel = vy_channel * -CHASSIS_VY_RC_SEN;
 
     //keyboard set speed set-point
