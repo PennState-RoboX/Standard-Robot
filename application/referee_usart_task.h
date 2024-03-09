@@ -20,7 +20,7 @@
 
 #define USART_RX_BUF_LENGHT     512
 #define REFEREE_FIFO_BUF_LENGTH 1024
-#define CV_PACKET_LENGTH 13
+#define CV_PACKET_LENGTH 14
 
 
 typedef struct
@@ -28,6 +28,8 @@ typedef struct
   float yaw;
 	float pitch;
 	float depth;
+	char find_target;
+  char new_cv_data_flag;
 	
 }cv_Data_TypeDef;
 extern cv_Data_TypeDef cv_Data;
