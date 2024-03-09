@@ -33,7 +33,7 @@
 #include "remote_control.h"
 //pitch speed close-loop PID params, max out and max iout
 //pitch 速度环 PID参数以及 PID最大输出，积分输出
-#define PITCH_SPEED_PID_KP        2200.0f
+#define PITCH_SPEED_PID_KP        3600.0f
 #define PITCH_SPEED_PID_KI        0.0f
 #define PITCH_SPEED_PID_KD        0.0f
 #define PITCH_SPEED_PID_MAX_OUT   30000.0f
@@ -41,32 +41,32 @@
 
 //yaw speed close-loop PID params, max out and max iout
 //yaw 速度环 PID参数以及 PID最大输出，积分输出
-#define YAW_SPEED_PID_KP        3600.0f
-#define YAW_SPEED_PID_KI        20.0f
+#define YAW_SPEED_PID_KP        10000.0f
+#define YAW_SPEED_PID_KI        200.0f
 #define YAW_SPEED_PID_KD        0.0f
 #define YAW_SPEED_PID_MAX_OUT   30000.0f
 #define YAW_SPEED_PID_MAX_IOUT  5000.0f
 
 //pitch gyro angle close-loop PID params, max out and max iout
 //pitch 角度环 角度由陀螺仪解算 PID参数以及 PID最大输出，积分输出
-#define PITCH_GYRO_ABSOLUTE_PID_KP 15.0f
+#define PITCH_GYRO_ABSOLUTE_PID_KP 20.0f
 #define PITCH_GYRO_ABSOLUTE_PID_KI 0.0f
 #define PITCH_GYRO_ABSOLUTE_PID_KD 0.0f
 
-#define PITCH_GYRO_ABSOLUTE_PID_MAX_OUT 10.0f
+#define PITCH_GYRO_ABSOLUTE_PID_MAX_OUT 50.0f
 #define PITCH_GYRO_ABSOLUTE_PID_MAX_IOUT 0.0f
 
 //yaw gyro angle close-loop PID params, max out and max iout
 //yaw 角度环 角度由陀螺仪解算 PID参数以及 PID最大输出，积分输出
 #define YAW_GYRO_ABSOLUTE_PID_KP        5.3f
-#define YAW_GYRO_ABSOLUTE_PID_KI        1.0f
+#define YAW_GYRO_ABSOLUTE_PID_KI        0.005f
 #define YAW_GYRO_ABSOLUTE_PID_KD        0.0f
-#define YAW_GYRO_ABSOLUTE_PID_MAX_OUT   8.5f
-#define YAW_GYRO_ABSOLUTE_PID_MAX_IOUT  0.0f
+#define YAW_GYRO_ABSOLUTE_PID_MAX_OUT   10.0f
+#define YAW_GYRO_ABSOLUTE_PID_MAX_IOUT  0.01f
 
 //pitch encode angle close-loop PID params, max out and max iout
 //pitch 角度环 角度由编码器 PID参数以及 PID最大输出，积分输出
-#define PITCH_ENCODE_RELATIVE_PID_KP 50.0f
+#define PITCH_ENCODE_RELATIVE_PID_KP 5.0f
 #define PITCH_ENCODE_RELATIVE_PID_KI 0.00f
 #define PITCH_ENCODE_RELATIVE_PID_KD 0.0f
 
@@ -75,8 +75,8 @@
 
 //yaw encode angle close-loop PID params, max out and max iout
 //yaw 角度环 角度由编码器 PID参数以及 PID最大输出，积分输出
-#define YAW_ENCODE_RELATIVE_PID_KP        8.0f
-#define YAW_ENCODE_RELATIVE_PID_KI        0.0f
+#define YAW_ENCODE_RELATIVE_PID_KP        5.3f
+#define YAW_ENCODE_RELATIVE_PID_KI        0.005f
 #define YAW_ENCODE_RELATIVE_PID_KD        0.0f
 #define YAW_ENCODE_RELATIVE_PID_MAX_OUT   10.0f
 #define YAW_ENCODE_RELATIVE_PID_MAX_IOUT  0.0f
@@ -182,6 +182,8 @@ typedef struct
     fp32 Dout;
 
     fp32 out;
+
+    fp32 Deadband;
 } gimbal_PID_t;
 
 typedef struct

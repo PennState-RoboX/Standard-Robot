@@ -85,6 +85,8 @@
 #include "detect_task.h"
 
 #include "user_lib.h"
+#include "filter.h"
+#include "referee_usart_task.h"
 
 //when gimbal is in calibrating, set buzzer frequency and strenght
 //当云台在校准, 设置蜂鸣器频率和强度
@@ -274,8 +276,20 @@ static void gimbal_relative_angle_control(fp32 *yaw, fp32 *pitch, gimbal_control
   */
 static void gimbal_motionless_control(fp32 *yaw, fp32 *pitch, gimbal_control_t *gimbal_control_set);
 
+/**
+ * @brief          云台进入自瞄模式，通过上位机发送的数据控制
+ * @author         RM
+ * @param[in]      yaw: yaw轴角度控制，为角度的增量 单位 rad
+ * @param[in]      pitch: pitch轴角度控制，为角度的增量 单位 rad
+ * @param[in]      gimbal_control_set:云台数据指针
+ * @retval         none
+ */
+static void gimbal_auto_control(float *yaw, float *pitch, gimbal_control_t *gimbal_control_set);
+
+
 //云台行为状态机
-static gimbal_behaviour_e gimbal_behaviour = GIMBAL_ZERO_FORCE;
+// static gimbal_behaviour_e gimbal_behaviour = GIMBAL_ZERO_FORCE;
+gimbal_behaviour_e gimbal_behaviour = GIMBAL_ZERO_FORCE;
 
 /**
   * @brief          the function is called by gimbal_set_mode function in gimbal_task.c
@@ -331,6 +345,11 @@ void gimbal_behaviour_mode_set(gimbal_control_t *gimbal_mode_set)
         gimbal_mode_set->gimbal_yaw_motor.gimbal_motor_mode = GIMBAL_MOTOR_ENCONDE;
         gimbal_mode_set->gimbal_pitch_motor.gimbal_motor_mode = GIMBAL_MOTOR_ENCONDE;
     }
+    else if (gimbal_behaviour == GIMBAL_AUTO)
+    {
+        gimbal_mode_set->gimbal_yaw_motor.gimbal_motor_mode = GIMBAL_MOTOR_GYRO;
+        gimbal_mode_set->gimbal_pitch_motor.gimbal_motor_mode = GIMBAL_MOTOR_GYRO;
+    }
 }
 
 /**
@@ -356,6 +375,7 @@ void gimbal_behaviour_control_set(fp32 *add_yaw, fp32 *add_pitch, gimbal_control
         return;
     }
 
+    // static uint8_t last_behaviour = GIMBAL_ZERO_FORCE;
 
     if (gimbal_behaviour == GIMBAL_ZERO_FORCE)
     {
@@ -381,7 +401,18 @@ void gimbal_behaviour_control_set(fp32 *add_yaw, fp32 *add_pitch, gimbal_control
     {
         gimbal_motionless_control(add_yaw, add_pitch, gimbal_control_set);
     }
+    else if (gimbal_behaviour == GIMBAL_AUTO)
+    {
+        gimbal_auto_control(add_yaw, add_pitch, gimbal_control_set);
+    }
 
+    // if (last_behaviour != gimbal_behaviour)
+    // {
+    //     gimbal_control_set->gimbal_pitch_motor.absolute_angle_set = gimbal_control_set->gimbal_pitch_motor.absolute_angle;
+    //     gimbal_control_set->gimbal_yaw_motor.absolute_angle_set = gimbal_control_set->gimbal_yaw_motor.absolute_angle;
+    // }
+
+    // last_behaviour = gimbal_behaviour;
 }
 
 /**
@@ -507,7 +538,7 @@ static void gimbal_behavour_set(gimbal_control_t *gimbal_mode_set)
     }
     else if (switch_is_mid(gimbal_mode_set->gimbal_rc_ctrl->rc.s[GIMBAL_MODE_CHANNEL]))
     {
-        gimbal_behaviour = GIMBAL_RELATIVE_ANGLE;
+        gimbal_behaviour = GIMBAL_AUTO;
     }
     else if (switch_is_up(gimbal_mode_set->gimbal_rc_ctrl->rc.s[GIMBAL_MODE_CHANNEL]))
     {
@@ -811,4 +842,48 @@ static void gimbal_motionless_control(fp32 *yaw, fp32 *pitch, gimbal_control_t *
     }
     *yaw = 0.0f;
     *pitch = 0.0f;
+}
+
+Kf kf_yaw = {0.001f, 0.0032f, 0.0f, 0.0f};
+Kf kf_pitch = {0.001f, 0.0064f, 0.0f, 0.0f};
+static void gimbal_auto_control(float *yaw, float *pitch, gimbal_control_t *gimbal_control_set)
+{
+    if (yaw == NULL || pitch == NULL || gimbal_control_set == NULL)
+    {
+        return;
+    }
+
+    static float auto_yaw;
+    static float auto_pitch;
+
+    //向上位机发送姿态数据
+    // gimbal_data_send();
+
+    if (cv_Data.new_cv_data_flag == 1)
+    {
+        cv_Data.new_cv_data_flag = 0;
+        auto_yaw = gimbal_control_set->gimbal_yaw_motor.absolute_angle - cv_Data.yaw;
+
+        // testing: if pitch < 0, then scale the auto_pitch by 1.1
+        if (cv_Data.pitch > 0)
+        {
+            auto_pitch = gimbal_control_set->gimbal_pitch_motor.absolute_angle - cv_Data.pitch;
+        }
+        else
+        {
+            auto_pitch = gimbal_control_set->gimbal_pitch_motor.absolute_angle - cv_Data.pitch;
+        }
+
+    }
+
+    if (toe_is_error(USER_USART_DATA_TOE))
+    {
+        *yaw = gimbal_control_set->gimbal_yaw_motor.absolute_angle;
+        *pitch = gimbal_control_set->gimbal_pitch_motor.absolute_angle;
+    }
+    else
+    {
+        *yaw = KalmanFilter(auto_yaw, &kf_yaw);
+        *pitch = KalmanFilter(auto_pitch, &kf_pitch);
+    }
 }

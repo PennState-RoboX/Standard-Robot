@@ -41,6 +41,7 @@
 #include "INS_task.h"
 #include "shoot.h"
 #include "pid.h"
+#include "filter.h"
 
 
 //motor enconde value format, range[0-8191]
@@ -298,6 +299,11 @@ static void J_scope_gimbal_test(void);
 //gimbal control data
 //云台控制所有相关数据
 gimbal_control_t gimbal_control;
+
+
+//gimbal behaviour mode
+extern gimbal_behaviour_e gimbal_behaviour;
+
 
 //motor current 
 //发送的电机电流
@@ -828,6 +834,8 @@ static void gimbal_mode_change_control_transit(gimbal_control_t *gimbal_mode_cha
   * @param[out]     gimbal_set_control:"gimbal_control"变量指针.
   * @retval         none
   */
+
+
 static void gimbal_set_control(gimbal_control_t *set_control)
 {
     if (set_control == NULL)
@@ -837,9 +845,41 @@ static void gimbal_set_control(gimbal_control_t *set_control)
 
     fp32 add_yaw_angle = 0.0f;
     fp32 add_pitch_angle = 0.0f;
-
+    static float auto_yaw_target = 0.0f;
+    static float auto_pitch_target = 0.0f;
+    
     // Receive gimbal control from remote control
-    gimbal_behaviour_control_set(&add_yaw_angle, &add_pitch_angle, set_control);
+    // gimbal_behaviour_control_set(&add_yaw_angle, &add_pitch_angle, set_control);
+
+    // add_yaw_angle = cv_Data.yaw;
+    // add_pitch_angle = -0.1*cv_Data.pitch;
+
+    // add_yaw_angle = KalmanFilter(add_yaw_angle, &kf_yaw);
+    // add_pitch_angle = KalmanFilter(add_pitch_angle, &kf_pitch);
+
+    if (gimbal_behaviour == GIMBAL_AUTO)
+    {
+      if (toe_is_error(USER_USART_DATA_TOE))
+      {
+        auto_yaw_target = gimbal_control.gimbal_yaw_motor.absolute_angle;
+        auto_pitch_target = gimbal_control.gimbal_pitch_motor.absolute_angle;
+      }
+      else
+      {
+        gimbal_behaviour_control_set(&auto_yaw_target, &auto_pitch_target, &gimbal_control);
+        gimbal_control.gimbal_yaw_motor.absolute_angle_set = auto_yaw_target;
+        gimbal_control.gimbal_pitch_motor.absolute_angle_set = auto_pitch_target;
+        gimbal_absolute_angle_limit(&gimbal_control.gimbal_pitch_motor, 0.0f); //绝对角度控制限幅
+      }
+    }
+    else
+    {
+      auto_yaw_target = gimbal_control.gimbal_yaw_motor.absolute_angle;
+      auto_pitch_target = gimbal_control.gimbal_pitch_motor.absolute_angle;
+      gimbal_behaviour_control_set(&add_yaw_angle, &add_pitch_angle, &gimbal_control);
+      gimbal_control.gimbal_yaw_motor.absolute_angle_set = gimbal_control.gimbal_yaw_motor.absolute_angle_set + add_yaw_angle;
+      gimbal_absolute_angle_limit(&gimbal_control.gimbal_pitch_motor, add_pitch_angle); //绝对角度控制限幅
+    }
 
     // set motor control mode
     if (set_control->gimbal_yaw_motor.gimbal_motor_mode == GIMBAL_MOTOR_RAW)
@@ -847,11 +887,11 @@ static void gimbal_set_control(gimbal_control_t *set_control)
         //raw模式下，直接发送控制值
         set_control->gimbal_yaw_motor.raw_cmd_current = add_yaw_angle;
     }
-    else if (set_control->gimbal_yaw_motor.gimbal_motor_mode == GIMBAL_MOTOR_GYRO)
-    {
-        //gyro模式下，陀螺仪角度控制
-        gimbal_absolute_angle_limit(&set_control->gimbal_yaw_motor, add_yaw_angle);
-    }
+    // else if (set_control->gimbal_yaw_motor.gimbal_motor_mode == GIMBAL_MOTOR_GYRO)
+    // {
+    //     //gyro模式下，陀螺仪角度控制
+    //     gimbal_absolute_angle_limit(&set_control->gimbal_yaw_motor, add_yaw_angle);
+    // }
     else if (set_control->gimbal_yaw_motor.gimbal_motor_mode == GIMBAL_MOTOR_ENCONDE)
     {
         //enconde模式下，电机编码角度控制
@@ -868,11 +908,11 @@ static void gimbal_set_control(gimbal_control_t *set_control)
         //raw模式下，直接发送控制值
         set_control->gimbal_pitch_motor.raw_cmd_current = add_pitch_angle;
     }
-    else if (set_control->gimbal_pitch_motor.gimbal_motor_mode == GIMBAL_MOTOR_GYRO)
-    {
-        //gyro模式下，陀螺仪角度控制
-        gimbal_absolute_angle_limit(&set_control->gimbal_pitch_motor, add_pitch_angle);
-    }
+    // else if (set_control->gimbal_pitch_motor.gimbal_motor_mode == GIMBAL_MOTOR_GYRO)
+    // {
+    //     //gyro模式下，陀螺仪角度控制
+    //     gimbal_absolute_angle_limit(&set_control->gimbal_pitch_motor, add_pitch_angle);
+    // }
     else if (set_control->gimbal_pitch_motor.gimbal_motor_mode == GIMBAL_MOTOR_ENCONDE)
     {
         //enconde模式下，电机编码角度控制
@@ -980,45 +1020,50 @@ static void gimbal_control_loop(gimbal_control_t *control_loop)
         return;
     }
     
+    // yaw motor control
     if (control_loop->gimbal_yaw_motor.gimbal_motor_mode == GIMBAL_MOTOR_RAW)
     {
         gimbal_motor_raw_angle_control(&control_loop->gimbal_yaw_motor);
     }
     else if (control_loop->gimbal_yaw_motor.gimbal_motor_mode == GIMBAL_MOTOR_GYRO)
     {
-        gimbal_motor_absolute_angle_control(&control_loop->gimbal_yaw_motor);
+       gimbal_motor_absolute_angle_control(&control_loop->gimbal_yaw_motor);
+        
     }
     else if (control_loop->gimbal_yaw_motor.gimbal_motor_mode == GIMBAL_MOTOR_ENCONDE)
     {
-      if (cv_Data.yaw==0 && cv_Data.pitch==0)
-      {
-				control_loop->gimbal_yaw_motor.given_current=0;
-      }
-      else {
-        control_loop->gimbal_yaw_motor.motor_gyro_set = gimbal_PID_calc(&control_loop->gimbal_yaw_motor.gimbal_motor_absolute_angle_pid, cv_Data.yaw, 0, control_loop->gimbal_yaw_motor.motor_gyro);
-        control_loop->gimbal_yaw_motor.current_set = PID_calc(&control_loop->gimbal_yaw_motor.gimbal_motor_gyro_pid, control_loop->gimbal_yaw_motor.motor_gyro, control_loop->gimbal_yaw_motor.motor_gyro_set);
-        //控制值赋值
-        control_loop->gimbal_yaw_motor.given_current = (int16_t)(control_loop->gimbal_yaw_motor.current_set);
-      }
+				
+      // 角速度 pid
+      control_loop->gimbal_yaw_motor.motor_gyro_set = gimbal_PID_calc(&control_loop->gimbal_yaw_motor.gimbal_motor_absolute_angle_pid, cv_Data.yaw, 0, control_loop->gimbal_yaw_motor.motor_gyro);
+      //速度环 pid： gimbal_motor_gyro_pid
+      control_loop->gimbal_yaw_motor.current_set = PID_calc(&control_loop->gimbal_yaw_motor.gimbal_motor_gyro_pid, control_loop->gimbal_yaw_motor.motor_gyro, control_loop->gimbal_yaw_motor.motor_gyro_set);
+      //控制值赋值
+      control_loop->gimbal_yaw_motor.given_current = (int16_t)(control_loop->gimbal_yaw_motor.current_set);
 
     }
 
+    // pitch motor control
     if (control_loop->gimbal_pitch_motor.gimbal_motor_mode == GIMBAL_MOTOR_RAW)
     {
         gimbal_motor_raw_angle_control(&control_loop->gimbal_pitch_motor);
     }
     else if (control_loop->gimbal_pitch_motor.gimbal_motor_mode == GIMBAL_MOTOR_GYRO)
     {
-        gimbal_motor_absolute_angle_control(&control_loop->gimbal_pitch_motor);
+       
+      gimbal_motor_absolute_angle_control(&control_loop->gimbal_pitch_motor);
+      
     }
     else if (control_loop->gimbal_pitch_motor.gimbal_motor_mode == GIMBAL_MOTOR_ENCONDE)
     {
-  
-			control_loop->gimbal_pitch_motor.motor_gyro_set = gimbal_PID_calc(&control_loop->gimbal_pitch_motor.gimbal_motor_absolute_angle_pid, cv_Data.pitch, 0, control_loop->gimbal_pitch_motor.motor_gyro);
-			control_loop->gimbal_pitch_motor.current_set = PID_calc(&control_loop->gimbal_pitch_motor.gimbal_motor_gyro_pid, control_loop->gimbal_pitch_motor.motor_gyro, control_loop->gimbal_pitch_motor.motor_gyro_set);
+      
+        // 角度 pid
+			control_loop->gimbal_pitch_motor.motor_gyro_set = gimbal_PID_calc(&control_loop->gimbal_pitch_motor.gimbal_motor_absolute_angle_pid, control_loop->gimbal_pitch_motor.absolute_angle, control_loop->gimbal_pitch_motor.absolute_angle + cv_Data.pitch, control_loop->gimbal_pitch_motor.motor_gyro);
+      //速度环 pid： gimbal_motor_gyro_pid
+      control_loop->gimbal_pitch_motor.current_set = PID_calc(&control_loop->gimbal_pitch_motor.gimbal_motor_gyro_pid, control_loop->gimbal_pitch_motor.motor_gyro, control_loop->gimbal_pitch_motor.motor_gyro_set);
 			//控制值赋值
-			control_loop->gimbal_pitch_motor.given_current = (int16_t)(control_loop->gimbal_pitch_motor.current_set);
-    }
+			control_loop->gimbal_pitch_motor.given_current = -(int16_t)control_loop->gimbal_pitch_motor.current_set;
+    
+	}
 }
 
 /**
@@ -1142,6 +1187,8 @@ static void gimbal_PID_init(gimbal_PID_t *pid, fp32 maxout, fp32 max_iout, fp32 
 
     pid->max_iout = max_iout;
     pid->max_out = maxout;
+
+    pid->Deadband = -0.017f;
 }
 
 static fp32 gimbal_PID_calc(gimbal_PID_t *pid, fp32 get, fp32 set, fp32 error_delta)
@@ -1151,18 +1198,30 @@ static fp32 gimbal_PID_calc(gimbal_PID_t *pid, fp32 get, fp32 set, fp32 error_de
     {
         return 0.0f;
     }
+
     pid->get = get;
     pid->set = set;
 
     err = set - get;
     pid->err = rad_format(err);
-    pid->Pout = pid->kp * pid->err;
-    pid->Iout += pid->ki * pid->err;
-    pid->Dout = pid->kd * error_delta;
-    abs_limit(&pid->Iout, pid->max_iout);
-    pid->out = pid->Pout + pid->Iout + pid->Dout;
-    abs_limit(&pid->out, pid->max_out);
-    return pid->out;
+
+    // Add Deadband to the error
+    if (fabs(pid->err) > pid->Deadband)
+    {
+      pid->Pout = pid->kp * pid->err;
+      pid->Iout += pid->ki * pid->err;
+      pid->Dout = pid->kd * error_delta;
+      abs_limit(&pid->Iout, pid->max_iout);
+      pid->out = pid->Pout + pid->Iout + pid->Dout;
+      abs_limit(&pid->out, pid->max_out);
+      return pid->out;
+    }
+    else
+    {
+      pid->Iout = 0.0f;
+      pid->out = 0.0f;
+      return pid->out;
+    }
 }
 
 /**

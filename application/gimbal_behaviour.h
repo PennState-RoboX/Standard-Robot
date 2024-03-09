@@ -90,7 +90,8 @@ typedef enum
   GIMBAL_CALI,           
   GIMBAL_ABSOLUTE_ANGLE, 
   GIMBAL_RELATIVE_ANGLE, 
-  GIMBAL_MOTIONLESS,     
+  GIMBAL_MOTIONLESS,
+  GIMBAL_AUTO,     
 } gimbal_behaviour_e;
 
 /**
