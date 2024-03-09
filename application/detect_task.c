@@ -273,6 +273,7 @@ static void detect_init(uint32_t time)
             {100, 100, 5},  //referee
             {10, 10, 7},    //rm imu
             {100, 100, 1},  //oled
+            {800, 100, 15}, // CV usart data (using usart6)
         };
 
     for (uint8_t i = 0; i < ERROR_LIST_LENGHT; i++)

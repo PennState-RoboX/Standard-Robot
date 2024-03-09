@@ -75,6 +75,7 @@ enum errorList
     REFEREE_TOE,
     RM_IMU_TOE,
     OLED_TOE,
+    USER_USART_DATA_TOE,
     ERROR_LIST_LENGHT,
 };
 
