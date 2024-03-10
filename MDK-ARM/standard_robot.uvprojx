@@ -1003,6 +1003,11 @@
               <FileType>1</FileType>
               <FilePath>..\components\controller\pid.c</FilePath>
             </File>
+            <File>
+              <FileName>filter.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\components\controller\filter.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
