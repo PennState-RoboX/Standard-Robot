@@ -859,6 +859,7 @@ static void gimbal_set_control(gimbal_control_t *set_control)
 
     if (gimbal_behaviour == GIMBAL_AUTO)
     {
+    // If the data is not received, the target angle is set to the current angle
       if (toe_is_error(USER_USART_DATA_TOE))
       {
         auto_yaw_target = gimbal_control.gimbal_yaw_motor.absolute_angle;
