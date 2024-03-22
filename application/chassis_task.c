@@ -2,7 +2,7 @@
   ****************************(C) COPYRIGHT 2019 DJI****************************
   * @file       chassis.c/h
   * @brief      chassis control task,
-  *             µ×ÅÌ¿ØÖÆÈÎÎñ
+  *             åº•ç›˜æ§åˆ¶ä»»åŠ¡
   * @note       
   * @history
   *  Version    Date            Author          Modification
@@ -35,10 +35,10 @@
   * @param output   Processed output value. Set to zero if within deadband range.
   * @param deadline Deadband threshold value. Initial value is 10.
   *
-  * @brief          ´¦ÀíÒ£¿ØÆ÷ÊäÈëµÄËÀÇøÎÊÌâ¡£ºöÂÔÒ¡¸ËÖĞĞÄ¸½½üµÄĞ¡·ùÒÆ¶¯¡£
-  * @param input    Ò£¿ØÆ÷µÄÔ­Ê¼ÊäÈëÖµ¡£
-  * @param output   ´¦ÀíºóµÄÊä³öÖµ¡£ÔÚËÀÇø·¶Î§ÄÚÊ±ÉèÎªÁã¡£
-  * @param deadline ËÀÇøµÄãĞÖµ¡£³õÊ¼ÖµÉèÎª10¡£
+  * @brief          å¤„ç†é¥æ§å™¨è¾“å…¥çš„æ­»åŒºé—®é¢˜ã€‚å¿½ç•¥æ‘‡æ†ä¸­å¿ƒé™„è¿‘çš„å°å¹…ç§»åŠ¨ã€‚
+  * @param input    é¥æ§å™¨çš„åŸå§‹è¾“å…¥å€¼ã€‚
+  * @param output   å¤„ç†åçš„è¾“å‡ºå€¼ã€‚åœ¨æ­»åŒºèŒƒå›´å†…æ—¶è®¾ä¸ºé›¶ã€‚
+  * @param deadline æ­»åŒºçš„é˜ˆå€¼ã€‚åˆå§‹å€¼è®¾ä¸º10ã€‚
   */
 #define rc_deadband_limit(input, output, dealine)        \
     {                                                    \
@@ -60,8 +60,8 @@
   * @retval         none
   */
 /**
-  * @brief          ³õÊ¼»¯"chassis_move"±äÁ¿£¬°üÀ¨pid³õÊ¼»¯£¬ Ò£¿ØÆ÷Ö¸Õë³õÊ¼»¯£¬3508µ×ÅÌµç»úÖ¸Õë³õÊ¼»¯£¬ÔÆÌ¨µç»ú³õÊ¼»¯£¬ÍÓÂİÒÇ½Ç¶ÈÖ¸Õë³õÊ¼»¯
-  * @param[out]     chassis_move_init:"chassis_move"±äÁ¿Ö¸Õë.
+  * @brief          åˆå§‹åŒ–"chassis_move"å˜é‡ï¼ŒåŒ…æ‹¬pidåˆå§‹åŒ–ï¼Œ é¥æ§å™¨æŒ‡é’ˆåˆå§‹åŒ–ï¼Œ3508åº•ç›˜ç”µæœºæŒ‡é’ˆåˆå§‹åŒ–ï¼Œäº‘å°ç”µæœºåˆå§‹åŒ–ï¼Œé™€èºä»ªè§’åº¦æŒ‡é’ˆåˆå§‹åŒ–
+  * @param[out]     chassis_move_init:"chassis_move"å˜é‡æŒ‡é’ˆ.
   * @retval         none
   */
 static void chassis_init(chassis_move_t *chassis_move_init);
@@ -72,8 +72,8 @@ static void chassis_init(chassis_move_t *chassis_move_init);
   * @retval         none
   */
 /**
-  * @brief          ÉèÖÃµ×ÅÌ¿ØÖÆÄ£Ê½£¬Ö÷ÒªÔÚ'chassis_behaviour_mode_set'º¯ÊıÖĞ¸Ä±ä
-  * @param[out]     chassis_move_mode:"chassis_move"±äÁ¿Ö¸Õë.
+  * @brief          è®¾ç½®åº•ç›˜æ§åˆ¶æ¨¡å¼ï¼Œä¸»è¦åœ¨'chassis_behaviour_mode_set'å‡½æ•°ä¸­æ”¹å˜
+  * @param[out]     chassis_move_mode:"chassis_move"å˜é‡æŒ‡é’ˆ.
   * @retval         none
   */
 static void chassis_set_mode(chassis_move_t *chassis_move_mode);
@@ -84,19 +84,19 @@ static void chassis_set_mode(chassis_move_t *chassis_move_mode);
   * @retval         none
   */
 /**
-  * @brief          µ×ÅÌÄ£Ê½¸Ä±ä£¬ÓĞĞ©²ÎÊıĞèÒª¸Ä±ä£¬ÀıÈçµ×ÅÌ¿ØÖÆyaw½Ç¶ÈÉè¶¨ÖµÓ¦¸Ã±ä³Éµ±Ç°µ×ÅÌyaw½Ç¶È
-  * @param[out]     chassis_move_transit:"chassis_move"±äÁ¿Ö¸Õë.
+  * @brief          åº•ç›˜æ¨¡å¼æ”¹å˜ï¼Œæœ‰äº›å‚æ•°éœ€è¦æ”¹å˜ï¼Œä¾‹å¦‚åº•ç›˜æ§åˆ¶yawè§’åº¦è®¾å®šå€¼åº”è¯¥å˜æˆå½“å‰åº•ç›˜yawè§’åº¦
+  * @param[out]     chassis_move_transit:"chassis_move"å˜é‡æŒ‡é’ˆ.
   * @retval         none
   */
 void chassis_mode_change_control_transit(chassis_move_t *chassis_move_transit);
 /**
-  * @brief          chassis some measure data updata, such as motor speed, euler angle£¬ robot speed
+  * @brief          chassis some measure data updata, such as motor speed, euler angleï¼Œ robot speed
   * @param[out]     chassis_move_update: "chassis_move" valiable point
   * @retval         none
   */
 /**
-  * @brief          µ×ÅÌ²âÁ¿Êı¾İ¸üĞÂ£¬°üÀ¨µç»úËÙ¶È£¬Å·À­½Ç¶È£¬»úÆ÷ÈËËÙ¶È
-  * @param[out]     chassis_move_update:"chassis_move"±äÁ¿Ö¸Õë.
+  * @brief          åº•ç›˜æµ‹é‡æ•°æ®æ›´æ–°ï¼ŒåŒ…æ‹¬ç”µæœºé€Ÿåº¦ï¼Œæ¬§æ‹‰è§’åº¦ï¼Œæœºå™¨äººé€Ÿåº¦
+  * @param[out]     chassis_move_update:"chassis_move"å˜é‡æŒ‡é’ˆ.
   * @retval         none
   */
 static void chassis_feedback_update(chassis_move_t *chassis_move_update);
@@ -108,7 +108,7 @@ static void chassis_feedback_update(chassis_move_t *chassis_move_update);
   */
 /**
   * @brief          
-  * @param[out]     chassis_move_update:"chassis_move"±äÁ¿Ö¸Õë.
+  * @param[out]     chassis_move_update:"chassis_move"å˜é‡æŒ‡é’ˆ.
   * @retval         none
   */
 static void chassis_set_contorl(chassis_move_t *chassis_move_control);
@@ -119,8 +119,8 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control);
   * @retval         none
   */
 /**
-  * @brief          ¿ØÖÆÑ­»·£¬¸ù¾İ¿ØÖÆÉè¶¨Öµ£¬¼ÆËãµç»úµçÁ÷Öµ£¬½øĞĞ¿ØÖÆ
-  * @param[out]     chassis_move_control_loop:"chassis_move"±äÁ¿Ö¸Õë.
+  * @brief          æ§åˆ¶å¾ªç¯ï¼Œæ ¹æ®æ§åˆ¶è®¾å®šå€¼ï¼Œè®¡ç®—ç”µæœºç”µæµå€¼ï¼Œè¿›è¡Œæ§åˆ¶
+  * @param[out]     chassis_move_control_loop:"chassis_move"å˜é‡æŒ‡é’ˆ.
   * @retval         none
   */
 static void chassis_control_loop(chassis_move_t *chassis_move_control_loop);
@@ -131,7 +131,7 @@ uint32_t chassis_high_water;
 
 
 
-//µ×ÅÌÔË¶¯Êı¾İ
+//åº•ç›˜è¿åŠ¨æ•°æ®
 chassis_move_t chassis_move;
 
 /**
@@ -140,20 +140,20 @@ chassis_move_t chassis_move;
   * @retval         none
   */
 /**
-  * @brief          µ×ÅÌÈÎÎñ£¬¼ä¸ô CHASSIS_CONTROL_TIME_MS 2ms
-  * @param[in]      pvParameters: ¿Õ
+  * @brief          åº•ç›˜ä»»åŠ¡ï¼Œé—´éš” CHASSIS_CONTROL_TIME_MS 2ms
+  * @param[in]      pvParameters: ç©º
   * @retval         none
   */
 void chassis_task(void const *pvParameters)
 {
     //wait a time 
-    //¿ÕÏĞÒ»¶ÎÊ±¼ä
+    //ç©ºé—²ä¸€æ®µæ—¶é—´
     vTaskDelay(CHASSIS_TASK_INIT_TIME);
     //chassis init
-    //µ×ÅÌ³õÊ¼»¯
+    //åº•ç›˜åˆå§‹åŒ–
     chassis_init(&chassis_move);
     //make sure all chassis motor is online,
-    //ÅĞ¶Ïµ×ÅÌµç»úÊÇ·ñ¶¼ÔÚÏß
+    //åˆ¤æ–­åº•ç›˜ç”µæœºæ˜¯å¦éƒ½åœ¨çº¿
     while (toe_is_error(CHASSIS_MOTOR1_TOE) || toe_is_error(CHASSIS_MOTOR2_TOE) || toe_is_error(CHASSIS_MOTOR3_TOE) || toe_is_error(CHASSIS_MOTOR4_TOE) || toe_is_error(DBUS_TOE))
     {
         vTaskDelay(CHASSIS_CONTROL_TIME_MS);
@@ -162,27 +162,27 @@ void chassis_task(void const *pvParameters)
     while (1)
     {
         //set chassis control mode
-        //ÉèÖÃµ×ÅÌ¿ØÖÆÄ£Ê½
+        //è®¾ç½®åº•ç›˜æ§åˆ¶æ¨¡å¼
         chassis_set_mode(&chassis_move);
         //when mode changes, some data save
-        //Ä£Ê½ÇĞ»»Êı¾İ±£´æ
+        //æ¨¡å¼åˆ‡æ¢æ•°æ®ä¿å­˜
         chassis_mode_change_control_transit(&chassis_move);
         //chassis data update
-        //µ×ÅÌÊı¾İ¸üĞÂ
+        //åº•ç›˜æ•°æ®æ›´æ–°
         chassis_feedback_update(&chassis_move);
         //set chassis control set-point 
-        //µ×ÅÌ¿ØÖÆÁ¿ÉèÖÃ
+        //åº•ç›˜æ§åˆ¶é‡è®¾ç½®
         chassis_set_contorl(&chassis_move);
         //chassis control pid calculate
-        //µ×ÅÌ¿ØÖÆPID¼ÆËã
+        //åº•ç›˜æ§åˆ¶PIDè®¡ç®—
         chassis_control_loop(&chassis_move);
 
         //make sure  one motor is online at least, so that the control CAN message can be received
-        //È·±£ÖÁÉÙÒ»¸öµç»úÔÚÏß£¬ ÕâÑùCAN¿ØÖÆ°ü¿ÉÒÔ±»½ÓÊÕµ½
+        //ç¡®ä¿è‡³å°‘ä¸€ä¸ªç”µæœºåœ¨çº¿ï¼Œ è¿™æ ·CANæ§åˆ¶åŒ…å¯ä»¥è¢«æ¥æ”¶åˆ°
         if (!(toe_is_error(CHASSIS_MOTOR1_TOE) && toe_is_error(CHASSIS_MOTOR2_TOE) && toe_is_error(CHASSIS_MOTOR3_TOE) && toe_is_error(CHASSIS_MOTOR4_TOE)))
         {
             //when remote control is offline, chassis motor should receive zero current. 
-            //µ±Ò£¿ØÆ÷µôÏßµÄÊ±ºò£¬·¢ËÍ¸øµ×ÅÌµç»úÁãµçÁ÷.
+            //å½“é¥æ§å™¨æ‰çº¿çš„æ—¶å€™ï¼Œå‘é€ç»™åº•ç›˜ç”µæœºé›¶ç”µæµ.
             if (toe_is_error(DBUS_TOE))
             {
                 CAN_cmd_chassis(0, 0, 0, 0);
@@ -190,13 +190,13 @@ void chassis_task(void const *pvParameters)
             else
             {
                 //send control current
-                //·¢ËÍ¿ØÖÆµçÁ÷
+                //å‘é€æ§åˆ¶ç”µæµ
                 CAN_cmd_chassis(chassis_move.motor_chassis[0].give_current, chassis_move.motor_chassis[1].give_current,
                                 chassis_move.motor_chassis[2].give_current, chassis_move.motor_chassis[3].give_current);
             }
         }
         //os delay
-        //ÏµÍ³ÑÓÊ±
+        //ç³»ç»Ÿå»¶æ—¶
         vTaskDelay(CHASSIS_CONTROL_TIME_MS);
 
 #if INCLUDE_uxTaskGetStackHighWaterMark
@@ -212,8 +212,8 @@ void chassis_task(void const *pvParameters)
   * @retval         none
   */
 /**
-  * @brief          ³õÊ¼»¯"chassis_move"±äÁ¿£¬°üÀ¨pid³õÊ¼»¯£¬ Ò£¿ØÆ÷Ö¸Õë³õÊ¼»¯£¬3508µ×ÅÌµç»úÖ¸Õë³õÊ¼»¯£¬ÔÆÌ¨µç»ú³õÊ¼»¯£¬ÍÓÂİÒÇ½Ç¶ÈÖ¸Õë³õÊ¼»¯
-  * @param[out]     chassis_move_init:"chassis_move"±äÁ¿Ö¸Õë.
+  * @brief          åˆå§‹åŒ–"chassis_move"å˜é‡ï¼ŒåŒ…æ‹¬pidåˆå§‹åŒ–ï¼Œ é¥æ§å™¨æŒ‡é’ˆåˆå§‹åŒ–ï¼Œ3508åº•ç›˜ç”µæœºæŒ‡é’ˆåˆå§‹åŒ–ï¼Œäº‘å°ç”µæœºåˆå§‹åŒ–ï¼Œé™€èºä»ªè§’åº¦æŒ‡é’ˆåˆå§‹åŒ–
+  * @param[out]     chassis_move_init:"chassis_move"å˜é‡æŒ‡é’ˆ.
   * @retval         none
   */
 static void chassis_init(chassis_move_t *chassis_move_init)
@@ -224,57 +224,57 @@ static void chassis_init(chassis_move_t *chassis_move_init)
     }
 
     //chassis motor speed PID
-    //µ×ÅÌËÙ¶È»·pidÖµ
+    //åº•ç›˜é€Ÿåº¦ç¯pidå€¼
     const static fp32 motor_speed_pid[3] = {M3505_MOTOR_SPEED_PID_KP, M3505_MOTOR_SPEED_PID_KI, M3505_MOTOR_SPEED_PID_KD};
     
     //chassis angle PID
-    //µ×ÅÌ½Ç¶ÈpidÖµ
+    //åº•ç›˜è§’åº¦pidå€¼
     const static fp32 chassis_yaw_pid[3] = {CHASSIS_FOLLOW_GIMBAL_PID_KP, CHASSIS_FOLLOW_GIMBAL_PID_KI, CHASSIS_FOLLOW_GIMBAL_PID_KD};
     
     const static fp32 chassis_x_order_filter[1] = {CHASSIS_ACCEL_X_NUM};
     const static fp32 chassis_y_order_filter[1] = {CHASSIS_ACCEL_Y_NUM};
     uint8_t i;
 
-    //in beginning£¬ chassis mode is raw 
-    //µ×ÅÌ¿ª»ú×´Ì¬ÎªÔ­Ê¼
+    //in beginningï¼Œ chassis mode is raw 
+    //åº•ç›˜å¼€æœºçŠ¶æ€ä¸ºåŸå§‹
     chassis_move_init->chassis_mode = CHASSIS_VECTOR_RAW;
     //get remote control point
-    //»ñÈ¡Ò£¿ØÆ÷Ö¸Õë
+    //è·å–é¥æ§å™¨æŒ‡é’ˆ
     chassis_move_init->chassis_RC = get_remote_control_point();
     //get gyro sensor euler angle point
-    //»ñÈ¡ÍÓÂİÒÇ×ËÌ¬½ÇÖ¸Õë
+    //è·å–é™€èºä»ªå§¿æ€è§’æŒ‡é’ˆ
     chassis_move_init->chassis_INS_angle = get_INS_angle_point();
     //get gimbal motor data point
-    //»ñÈ¡ÔÆÌ¨µç»úÊı¾İÖ¸Õë
+    //è·å–äº‘å°ç”µæœºæ•°æ®æŒ‡é’ˆ
     chassis_move_init->chassis_yaw_motor = get_yaw_motor_point();
     chassis_move_init->chassis_pitch_motor = get_pitch_motor_point();
     
     //get chassis motor data point,  initialize motor speed PID
-    //»ñÈ¡µ×ÅÌµç»úÊı¾İÖ¸Õë£¬³õÊ¼»¯PID 
+    //è·å–åº•ç›˜ç”µæœºæ•°æ®æŒ‡é’ˆï¼Œåˆå§‹åŒ–PID 
     for (i = 0; i < 4; i++)
     {
         chassis_move_init->motor_chassis[i].chassis_motor_measure = get_chassis_motor_measure_point(i);
         PID_init(&chassis_move_init->motor_speed_pid[i], PID_POSITION, motor_speed_pid, M3505_MOTOR_SPEED_PID_MAX_OUT, M3505_MOTOR_SPEED_PID_MAX_IOUT);
     }
     //initialize angle PID
-    //³õÊ¼»¯½Ç¶ÈPID
+    //åˆå§‹åŒ–è§’åº¦PID
     PID_init(&chassis_move_init->chassis_angle_pid, PID_POSITION, chassis_yaw_pid, CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT, CHASSIS_FOLLOW_GIMBAL_PID_MAX_IOUT);
     
     //first order low-pass filter  replace ramp function
-    //ÓÃÒ»½×ÂË²¨´úÌæĞ±²¨º¯ÊıÉú³É
+    //ç”¨ä¸€é˜¶æ»¤æ³¢ä»£æ›¿æ–œæ³¢å‡½æ•°ç”Ÿæˆ
     first_order_filter_init(&chassis_move_init->chassis_cmd_slow_set_vx, CHASSIS_CONTROL_TIME, chassis_x_order_filter);
     first_order_filter_init(&chassis_move_init->chassis_cmd_slow_set_vy, CHASSIS_CONTROL_TIME, chassis_y_order_filter);
 
     //max and min speed
-    //×î´ó ×îĞ¡ËÙ¶È
-    chassis_move_init->vx_max_speed = NORMAL_MAX_CHASSIS_SPEED_X;
+    //æœ€å¤§ æœ€å°é€Ÿåº¦
+  chassis_move_init->vx_max_speed = NORMAL_MAX_CHASSIS_SPEED_X * 0.5;
     chassis_move_init->vx_min_speed = -NORMAL_MAX_CHASSIS_SPEED_X;
 
-    chassis_move_init->vy_max_speed = NORMAL_MAX_CHASSIS_SPEED_Y;
+  chassis_move_init->vy_max_speed = NORMAL_MAX_CHASSIS_SPEED_Y * 0.5;
     chassis_move_init->vy_min_speed = -NORMAL_MAX_CHASSIS_SPEED_Y;
 
     //update data
-    //¸üĞÂÒ»ÏÂÊı¾İ
+    //æ›´æ–°ä¸€ä¸‹æ•°æ®
     chassis_feedback_update(chassis_move_init);
 }
 
@@ -284,8 +284,8 @@ static void chassis_init(chassis_move_t *chassis_move_init)
   * @retval         none
   */
 /**
-  * @brief          ÉèÖÃµ×ÅÌ¿ØÖÆÄ£Ê½£¬Ö÷ÒªÔÚ'chassis_behaviour_mode_set'º¯ÊıÖĞ¸Ä±ä
-  * @param[out]     chassis_move_mode:"chassis_move"±äÁ¿Ö¸Õë.
+  * @brief          è®¾ç½®åº•ç›˜æ§åˆ¶æ¨¡å¼ï¼Œä¸»è¦åœ¨'chassis_behaviour_mode_set'å‡½æ•°ä¸­æ”¹å˜
+  * @param[out]     chassis_move_mode:"chassis_move"å˜é‡æŒ‡é’ˆ.
   * @retval         none
   */
 static void chassis_set_mode(chassis_move_t *chassis_move_mode)
@@ -304,8 +304,8 @@ static void chassis_set_mode(chassis_move_t *chassis_move_mode)
   * @retval         none
   */
 /**
-  * @brief          µ×ÅÌÄ£Ê½¸Ä±ä£¬ÓĞĞ©²ÎÊıĞèÒª¸Ä±ä£¬ÀıÈçµ×ÅÌ¿ØÖÆyaw½Ç¶ÈÉè¶¨ÖµÓ¦¸Ã±ä³Éµ±Ç°µ×ÅÌyaw½Ç¶È
-  * @param[out]     chassis_move_transit:"chassis_move"±äÁ¿Ö¸Õë.
+  * @brief          åº•ç›˜æ¨¡å¼æ”¹å˜ï¼Œæœ‰äº›å‚æ•°éœ€è¦æ”¹å˜ï¼Œä¾‹å¦‚åº•ç›˜æ§åˆ¶yawè§’åº¦è®¾å®šå€¼åº”è¯¥å˜æˆå½“å‰åº•ç›˜yawè§’åº¦
+  * @param[out]     chassis_move_transit:"chassis_move"å˜é‡æŒ‡é’ˆ.
   * @retval         none
   */
 static void chassis_mode_change_control_transit(chassis_move_t *chassis_move_transit)
@@ -321,19 +321,19 @@ static void chassis_mode_change_control_transit(chassis_move_t *chassis_move_tra
     }
 
     //change to follow gimbal angle mode
-    //ÇĞÈë¸úËæÔÆÌ¨Ä£Ê½
+    //åˆ‡å…¥è·Ÿéšäº‘å°æ¨¡å¼
     if ((chassis_move_transit->last_chassis_mode != CHASSIS_VECTOR_FOLLOW_GIMBAL_YAW) && chassis_move_transit->chassis_mode == CHASSIS_VECTOR_FOLLOW_GIMBAL_YAW)
     {
         chassis_move_transit->chassis_relative_angle_set = 0.0f;
     }
     //change to follow chassis yaw angle
-    //ÇĞÈë¸úËæµ×ÅÌ½Ç¶ÈÄ£Ê½
+    //åˆ‡å…¥è·Ÿéšåº•ç›˜è§’åº¦æ¨¡å¼
     else if ((chassis_move_transit->last_chassis_mode != CHASSIS_VECTOR_FOLLOW_CHASSIS_YAW) && chassis_move_transit->chassis_mode == CHASSIS_VECTOR_FOLLOW_CHASSIS_YAW)
     {
         chassis_move_transit->chassis_yaw_set = chassis_move_transit->chassis_yaw;
     }
     //change to no follow angle
-    //ÇĞÈë²»¸úËæÔÆÌ¨Ä£Ê½
+    //åˆ‡å…¥ä¸è·Ÿéšäº‘å°æ¨¡å¼
     else if ((chassis_move_transit->last_chassis_mode != CHASSIS_VECTOR_NO_FOLLOW_YAW) && chassis_move_transit->chassis_mode == CHASSIS_VECTOR_NO_FOLLOW_YAW)
     {
         chassis_move_transit->chassis_yaw_set = chassis_move_transit->chassis_yaw;
@@ -343,13 +343,13 @@ static void chassis_mode_change_control_transit(chassis_move_t *chassis_move_tra
 }
 
 /**
-  * @brief          chassis some measure data updata, such as motor speed, euler angle£¬ robot speed
+  * @brief          chassis some measure data updata, such as motor speed, euler angleï¼Œ robot speed
   * @param[out]     chassis_move_update: "chassis_move" valiable point
   * @retval         none
   */
 /**
-  * @brief          µ×ÅÌ²âÁ¿Êı¾İ¸üĞÂ£¬°üÀ¨µç»úËÙ¶È£¬Å·À­½Ç¶È£¬»úÆ÷ÈËËÙ¶È
-  * @param[out]     chassis_move_update:"chassis_move"±äÁ¿Ö¸Õë.
+  * @brief          åº•ç›˜æµ‹é‡æ•°æ®æ›´æ–°ï¼ŒåŒ…æ‹¬ç”µæœºé€Ÿåº¦ï¼Œæ¬§æ‹‰è§’åº¦ï¼Œæœºå™¨äººé€Ÿåº¦
+  * @param[out]     chassis_move_update:"chassis_move"å˜é‡æŒ‡é’ˆ.
   * @retval         none
   */
 static void chassis_feedback_update(chassis_move_t *chassis_move_update)
@@ -363,19 +363,19 @@ static void chassis_feedback_update(chassis_move_t *chassis_move_update)
     for (i = 0; i < 4; i++)
     {
         //update motor speed, accel is differential of speed PID
-        //¸üĞÂµç»úËÙ¶È£¬¼ÓËÙ¶ÈÊÇËÙ¶ÈµÄPIDÎ¢·Ö
+        //æ›´æ–°ç”µæœºé€Ÿåº¦ï¼ŒåŠ é€Ÿåº¦æ˜¯é€Ÿåº¦çš„PIDå¾®åˆ†
         chassis_move_update->motor_chassis[i].speed = CHASSIS_MOTOR_RPM_TO_VECTOR_SEN * chassis_move_update->motor_chassis[i].chassis_motor_measure->speed_rpm;
         chassis_move_update->motor_chassis[i].accel = chassis_move_update->motor_speed_pid[i].Dbuf[0] * CHASSIS_CONTROL_FREQUENCE;
     }
 
     //calculate vertical speed, horizontal speed ,rotation speed, left hand rule 
-    //¸üĞÂµ×ÅÌ×İÏòËÙ¶È x£¬ Æ½ÒÆËÙ¶Èy£¬Ğı×ªËÙ¶Èwz£¬×ø±êÏµÎªÓÒÊÖÏµ
+    //æ›´æ–°åº•ç›˜çºµå‘é€Ÿåº¦ xï¼Œ å¹³ç§»é€Ÿåº¦yï¼Œæ—‹è½¬é€Ÿåº¦wzï¼Œåæ ‡ç³»ä¸ºå³æ‰‹ç³»
     chassis_move_update->vx = (-chassis_move_update->motor_chassis[0].speed + chassis_move_update->motor_chassis[1].speed + chassis_move_update->motor_chassis[2].speed - chassis_move_update->motor_chassis[3].speed) * MOTOR_SPEED_TO_CHASSIS_SPEED_VX;
     chassis_move_update->vy = (-chassis_move_update->motor_chassis[0].speed - chassis_move_update->motor_chassis[1].speed + chassis_move_update->motor_chassis[2].speed + chassis_move_update->motor_chassis[3].speed) * MOTOR_SPEED_TO_CHASSIS_SPEED_VY;
     chassis_move_update->wz = (-chassis_move_update->motor_chassis[0].speed - chassis_move_update->motor_chassis[1].speed - chassis_move_update->motor_chassis[2].speed - chassis_move_update->motor_chassis[3].speed) * MOTOR_SPEED_TO_CHASSIS_SPEED_WZ / MOTOR_DISTANCE_TO_CENTER;
 
     //calculate chassis euler angle, if chassis add a new gyro sensor,please change this code
-    //¼ÆËãµ×ÅÌ×ËÌ¬½Ç¶È, Èç¹ûµ×ÅÌÉÏÓĞÍÓÂİÒÇÇë¸ü¸ÄÕâ²¿·Ö´úÂë
+    //è®¡ç®—åº•ç›˜å§¿æ€è§’åº¦, å¦‚æœåº•ç›˜ä¸Šæœ‰é™€èºä»ªè¯·æ›´æ”¹è¿™éƒ¨åˆ†ä»£ç 
     chassis_move_update->chassis_yaw = rad_format(*(chassis_move_update->chassis_INS_angle + INS_YAW_ADDRESS_OFFSET) - chassis_move_update->chassis_yaw_motor->relative_angle);
     chassis_move_update->chassis_pitch = rad_format(*(chassis_move_update->chassis_INS_angle + INS_PITCH_ADDRESS_OFFSET) - chassis_move_update->chassis_pitch_motor->relative_angle);
     chassis_move_update->chassis_roll = *(chassis_move_update->chassis_INS_angle + INS_ROLL_ADDRESS_OFFSET);
@@ -389,11 +389,11 @@ static void chassis_feedback_update(chassis_move_t *chassis_move_update)
   * @retval         none
   */
 /**
-  * @brief          ¸ù¾İÒ£¿ØÆ÷Í¨µÀÖµ£¬¼ÆËã×İÏòºÍºáÒÆËÙ¶È
+  * @brief          æ ¹æ®é¥æ§å™¨é€šé“å€¼ï¼Œè®¡ç®—çºµå‘å’Œæ¨ªç§»é€Ÿåº¦
   *                 
-  * @param[out]     vx_set: ×İÏòËÙ¶ÈÖ¸Õë
-  * @param[out]     vy_set: ºáÏòËÙ¶ÈÖ¸Õë
-  * @param[out]     chassis_move_rc_to_vector: "chassis_move" ±äÁ¿Ö¸Õë
+  * @param[out]     vx_set: çºµå‘é€Ÿåº¦æŒ‡é’ˆ
+  * @param[out]     vy_set: æ¨ªå‘é€Ÿåº¦æŒ‡é’ˆ
+  * @param[out]     chassis_move_rc_to_vector: "chassis_move" å˜é‡æŒ‡é’ˆ
   * @retval         none
   */
 void chassis_rc_to_control_vector(fp32 *vx_set, fp32 *vy_set, chassis_move_t *chassis_move_rc_to_vector)
@@ -406,39 +406,39 @@ void chassis_rc_to_control_vector(fp32 *vx_set, fp32 *vy_set, chassis_move_t *ch
     int16_t vx_channel, vy_channel;
     fp32 vx_set_channel, vy_set_channel;
     //deadline, because some remote control need be calibrated,  the value of rocker is not zero in middle place,
-    //ËÀÇøÏŞÖÆ£¬ÒòÎªÒ£¿ØÆ÷¿ÉÄÜ´æÔÚ²îÒì Ò¡¸ËÔÚÖĞ¼ä£¬ÆäÖµ²»Îª0
+    //æ­»åŒºé™åˆ¶ï¼Œå› ä¸ºé¥æ§å™¨å¯èƒ½å­˜åœ¨å·®å¼‚ æ‘‡æ†åœ¨ä¸­é—´ï¼Œå…¶å€¼ä¸ä¸º0
     rc_deadband_limit(chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_X_CHANNEL], vx_channel, CHASSIS_RC_DEADLINE);
     rc_deadband_limit(chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_Y_CHANNEL], vy_channel, CHASSIS_RC_DEADLINE);
 
     vx_set_channel = vx_channel * -CHASSIS_VX_RC_SEN;
     vy_set_channel = vy_channel * -CHASSIS_VY_RC_SEN;
 
-    //keyboard set speed set-point
-    //¼üÅÌ¿ØÖÆ
-    if (chassis_move_rc_to_vector->chassis_RC->key.v & CHASSIS_FRONT_KEY)
+  // keyboard set speed set-point
+  // é”®ç›˜æ§åˆ¶
+  if (chassis_move_rc_to_vector->chassis_RC->key.v & CHASSIS_LEFT_KEY)
     {
         vx_set_channel = chassis_move_rc_to_vector->vx_max_speed;
     }
-    else if (chassis_move_rc_to_vector->chassis_RC->key.v & CHASSIS_BACK_KEY)
+  else if (chassis_move_rc_to_vector->chassis_RC->key.v & CHASSIS_RIGHT_KEY)
     {
         vx_set_channel = chassis_move_rc_to_vector->vx_min_speed;
     }
 
-    if (chassis_move_rc_to_vector->chassis_RC->key.v & CHASSIS_LEFT_KEY)
+  if (chassis_move_rc_to_vector->chassis_RC->key.v & CHASSIS_BACK_KEY)
     {
         vy_set_channel = chassis_move_rc_to_vector->vy_max_speed;
     }
-    else if (chassis_move_rc_to_vector->chassis_RC->key.v & CHASSIS_RIGHT_KEY)
+  else if (chassis_move_rc_to_vector->chassis_RC->key.v & CHASSIS_FRONT_KEY)
     {
         vy_set_channel = chassis_move_rc_to_vector->vy_min_speed;
     }
 
     //first order low-pass replace ramp function, calculate chassis speed set-point to improve control performance
-    //Ò»½×µÍÍ¨ÂË²¨´úÌæĞ±²¨×÷Îªµ×ÅÌËÙ¶ÈÊäÈë
+    //ä¸€é˜¶ä½é€šæ»¤æ³¢ä»£æ›¿æ–œæ³¢ä½œä¸ºåº•ç›˜é€Ÿåº¦è¾“å…¥
     first_order_filter_cali(&chassis_move_rc_to_vector->chassis_cmd_slow_set_vx, vx_set_channel);
     first_order_filter_cali(&chassis_move_rc_to_vector->chassis_cmd_slow_set_vy, vy_set_channel);
     //stop command, need not slow change, set zero derectly
-    //Í£Ö¹ĞÅºÅ£¬²»ĞèÒª»ºÂı¼ÓËÙ£¬Ö±½Ó¼õËÙµ½Áã
+    //åœæ­¢ä¿¡å·ï¼Œä¸éœ€è¦ç¼“æ…¢åŠ é€Ÿï¼Œç›´æ¥å‡é€Ÿåˆ°é›¶
     if (vx_set_channel < CHASSIS_RC_DEADLINE * CHASSIS_VX_RC_SEN && vx_set_channel > -CHASSIS_RC_DEADLINE * CHASSIS_VX_RC_SEN)
     {
         chassis_move_rc_to_vector->chassis_cmd_slow_set_vx.out = 0.0f;
@@ -458,8 +458,8 @@ void chassis_rc_to_control_vector(fp32 *vx_set, fp32 *vy_set, chassis_move_t *ch
   * @retval         none
   */
 /**
-  * @brief          ÉèÖÃµ×ÅÌ¿ØÖÆÉèÖÃÖµ, ÈıÔË¶¯¿ØÖÆÖµÊÇÍ¨¹ıchassis_behaviour_control_setº¯ÊıÉèÖÃµÄ
-  * @param[out]     chassis_move_update:"chassis_move"±äÁ¿Ö¸Õë.
+  * @brief          è®¾ç½®åº•ç›˜æ§åˆ¶è®¾ç½®å€¼, ä¸‰è¿åŠ¨æ§åˆ¶å€¼æ˜¯é€šè¿‡chassis_behaviour_control_setå‡½æ•°è®¾ç½®çš„
+  * @param[out]     chassis_move_update:"chassis_move"å˜é‡æŒ‡é’ˆ.
   * @retval         none
   */
 static void chassis_set_contorl(chassis_move_t *chassis_move_control)
@@ -472,28 +472,28 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control)
 
 
     fp32 vx_set = 0.0f, vy_set = 0.0f, angle_set = 0.0f;
-    //get three control set-point, »ñÈ¡Èı¸ö¿ØÖÆÉèÖÃÖµ
+    //get three control set-point, è·å–ä¸‰ä¸ªæ§åˆ¶è®¾ç½®å€¼
     chassis_behaviour_control_set(&vx_set, &vy_set, &angle_set, chassis_move_control);
 
     //follow gimbal mode
-    //¸úËæÔÆÌ¨Ä£Ê½
+    //è·Ÿéšäº‘å°æ¨¡å¼
     if (chassis_move_control->chassis_mode == CHASSIS_VECTOR_FOLLOW_GIMBAL_YAW)
     {
         fp32 sin_yaw = 0.0f, cos_yaw = 0.0f;
         //rotate chassis direction, make sure vertial direction follow gimbal 
-        //Ğı×ª¿ØÖÆµ×ÅÌËÙ¶È·½Ïò£¬±£Ö¤Ç°½ø·½ÏòÊÇÔÆÌ¨·½Ïò£¬ÓĞÀûÓÚÔË¶¯Æ½ÎÈ
+        //æ—‹è½¬æ§åˆ¶åº•ç›˜é€Ÿåº¦æ–¹å‘ï¼Œä¿è¯å‰è¿›æ–¹å‘æ˜¯äº‘å°æ–¹å‘ï¼Œæœ‰åˆ©äºè¿åŠ¨å¹³ç¨³
         sin_yaw = arm_sin_f32(-chassis_move_control->chassis_yaw_motor->relative_angle);
         cos_yaw = arm_cos_f32(-chassis_move_control->chassis_yaw_motor->relative_angle);
         chassis_move_control->vx_set = cos_yaw * vx_set + sin_yaw * vy_set;
         chassis_move_control->vy_set = -sin_yaw * vx_set + cos_yaw * vy_set;
         //set control relative angle  set-point
-        //ÉèÖÃ¿ØÖÆÏà¶ÔÔÆÌ¨½Ç¶È
+        //è®¾ç½®æ§åˆ¶ç›¸å¯¹äº‘å°è§’åº¦
         chassis_move_control->chassis_relative_angle_set = rad_format(angle_set);
         //calculate ratation speed
-        //¼ÆËãĞı×ªPID½ÇËÙ¶È
+        //è®¡ç®—æ—‹è½¬PIDè§’é€Ÿåº¦
         chassis_move_control->wz_set = -PID_calc(&chassis_move_control->chassis_angle_pid, chassis_move_control->chassis_yaw_motor->relative_angle, chassis_move_control->chassis_relative_angle_set);
         //speed limit
-        //ËÙ¶ÈÏŞ·ù
+        //é€Ÿåº¦é™å¹…
         chassis_move_control->vx_set = fp32_constrain(chassis_move_control->vx_set, chassis_move_control->vx_min_speed, chassis_move_control->vx_max_speed);
         chassis_move_control->vy_set = fp32_constrain(chassis_move_control->vy_set, chassis_move_control->vy_min_speed, chassis_move_control->vy_max_speed);
     }
@@ -501,21 +501,21 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control)
     {
         fp32 delat_angle = 0.0f;
         //set chassis yaw angle set-point
-        //ÉèÖÃµ×ÅÌ¿ØÖÆµÄ½Ç¶È
+        //è®¾ç½®åº•ç›˜æ§åˆ¶çš„è§’åº¦
         chassis_move_control->chassis_yaw_set = rad_format(angle_set);
         delat_angle = rad_format(chassis_move_control->chassis_yaw_set - chassis_move_control->chassis_yaw);
         //calculate rotation speed
-        //¼ÆËãĞı×ªµÄ½ÇËÙ¶È
+        //è®¡ç®—æ—‹è½¬çš„è§’é€Ÿåº¦
         chassis_move_control->wz_set = PID_calc(&chassis_move_control->chassis_angle_pid, 0.0f, delat_angle);
         //speed limit
-        //ËÙ¶ÈÏŞ·ù
+        //é€Ÿåº¦é™å¹…
         chassis_move_control->vx_set = fp32_constrain(vx_set, chassis_move_control->vx_min_speed, chassis_move_control->vx_max_speed);
         chassis_move_control->vy_set = fp32_constrain(vy_set, chassis_move_control->vy_min_speed, chassis_move_control->vy_max_speed);
     }
     else if (chassis_move_control->chassis_mode == CHASSIS_VECTOR_NO_FOLLOW_YAW)
     {
         //"angle_set" is rotation speed set-point
-        //¡°angle_set¡± ÊÇĞı×ªËÙ¶È¿ØÖÆ
+        //â€œangle_setâ€ æ˜¯æ—‹è½¬é€Ÿåº¦æ§åˆ¶
         chassis_move_control->wz_set = angle_set;
         chassis_move_control->vx_set = fp32_constrain(vx_set, chassis_move_control->vx_min_speed, chassis_move_control->vx_max_speed);
         chassis_move_control->vy_set = fp32_constrain(vy_set, chassis_move_control->vy_min_speed, chassis_move_control->vy_max_speed);
@@ -523,7 +523,7 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control)
     else if (chassis_move_control->chassis_mode == CHASSIS_VECTOR_RAW)
     {
         //in raw mode, set-point is sent to CAN bus
-        //ÔÚÔ­Ê¼Ä£Ê½£¬ÉèÖÃÖµÊÇ·¢ËÍµ½CAN×ÜÏß
+        //åœ¨åŸå§‹æ¨¡å¼ï¼Œè®¾ç½®å€¼æ˜¯å‘é€åˆ°CANæ€»çº¿
         chassis_move_control->vx_set = vx_set;
         chassis_move_control->vy_set = vy_set;
         chassis_move_control->wz_set = angle_set;
@@ -541,17 +541,17 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control)
   * @retval         none
   */
 /**
-  * @brief          ËÄ¸öÂóÂÖËÙ¶ÈÊÇÍ¨¹ıÈı¸ö²ÎÊı¼ÆËã³öÀ´µÄ
-  * @param[in]      vx_set: ×İÏòËÙ¶È
-  * @param[in]      vy_set: ºáÏòËÙ¶È
-  * @param[in]      wz_set: Ğı×ªËÙ¶È
-  * @param[out]     wheel_speed: ËÄ¸öÂóÂÖËÙ¶È
+  * @brief          å››ä¸ªéº¦è½®é€Ÿåº¦æ˜¯é€šè¿‡ä¸‰ä¸ªå‚æ•°è®¡ç®—å‡ºæ¥çš„
+  * @param[in]      vx_set: çºµå‘é€Ÿåº¦
+  * @param[in]      vy_set: æ¨ªå‘é€Ÿåº¦
+  * @param[in]      wz_set: æ—‹è½¬é€Ÿåº¦
+  * @param[out]     wheel_speed: å››ä¸ªéº¦è½®é€Ÿåº¦
   * @retval         none
   */
 static void chassis_vector_to_mecanum_wheel_speed(const fp32 vx_set, const fp32 vy_set, const fp32 wz_set, fp32 wheel_speed[4])
 {
     //because the gimbal is in front of chassis, when chassis rotates, wheel 0 and wheel 1 should be slower and wheel 2 and wheel 3 should be faster
-    //Ğı×ªµÄÊ±ºò£¬ ÓÉÓÚÔÆÌ¨¿¿Ç°£¬ËùÒÔÊÇÇ°ÃæÁ½ÂÖ 0 £¬1 Ğı×ªµÄËÙ¶È±äÂı£¬ ºóÃæÁ½ÂÖ 2,3 Ğı×ªµÄËÙ¶È±ä¿ì
+    //æ—‹è½¬çš„æ—¶å€™ï¼Œ ç”±äºäº‘å°é å‰ï¼Œæ‰€ä»¥æ˜¯å‰é¢ä¸¤è½® 0 ï¼Œ1 æ—‹è½¬çš„é€Ÿåº¦å˜æ…¢ï¼Œ åé¢ä¸¤è½® 2,3 æ—‹è½¬çš„é€Ÿåº¦å˜å¿«
     wheel_speed[0] = -vx_set - vy_set + (CHASSIS_WZ_SET_SCALE - 1.0f) * MOTOR_DISTANCE_TO_CENTER * wz_set;
     wheel_speed[1] = vx_set - vy_set + (CHASSIS_WZ_SET_SCALE - 1.0f) * MOTOR_DISTANCE_TO_CENTER * wz_set;
     wheel_speed[2] = vx_set + vy_set + (-CHASSIS_WZ_SET_SCALE - 1.0f) * MOTOR_DISTANCE_TO_CENTER * wz_set;
@@ -566,8 +566,8 @@ static void chassis_vector_to_mecanum_wheel_speed(const fp32 vx_set, const fp32 
   * @retval         none
   */
 /**
-  * @brief          ¿ØÖÆÑ­»·£¬¸ù¾İ¿ØÖÆÉè¶¨Öµ£¬¼ÆËãµç»úµçÁ÷Öµ£¬½øĞĞ¿ØÖÆ
-  * @param[out]     chassis_move_control_loop:"chassis_move"±äÁ¿Ö¸Õë.
+  * @brief          æ§åˆ¶å¾ªç¯ï¼Œæ ¹æ®æ§åˆ¶è®¾å®šå€¼ï¼Œè®¡ç®—ç”µæœºç”µæµå€¼ï¼Œè¿›è¡Œæ§åˆ¶
+  * @param[out]     chassis_move_control_loop:"chassis_move"å˜é‡æŒ‡é’ˆ.
   * @retval         none
   */
 static void chassis_control_loop(chassis_move_t *chassis_move_control_loop)
@@ -578,7 +578,7 @@ static void chassis_control_loop(chassis_move_t *chassis_move_control_loop)
     uint8_t i = 0;
 
     //mecanum wheel speed calculation
-    //ÂóÂÖÔË¶¯·Ö½â
+    //éº¦è½®è¿åŠ¨åˆ†è§£
     chassis_vector_to_mecanum_wheel_speed(chassis_move_control_loop->vx_set,
                                           chassis_move_control_loop->vy_set, chassis_move_control_loop->wz_set, wheel_speed);
 
@@ -590,12 +590,12 @@ static void chassis_control_loop(chassis_move_t *chassis_move_control_loop)
             chassis_move_control_loop->motor_chassis[i].give_current = (int16_t)(wheel_speed[i]);
         }
         //in raw mode, derectly return
-        //raw¿ØÖÆÖ±½Ó·µ»Ø
+        //rawæ§åˆ¶ç›´æ¥è¿”å›
         return;
     }
 
     //calculate the max speed in four wheels, limit the max speed
-    //¼ÆËãÂÖ×Ó¿ØÖÆ×î´óËÙ¶È£¬²¢ÏŞÖÆÆä×î´óËÙ¶È
+    //è®¡ç®—è½®å­æ§åˆ¶æœ€å¤§é€Ÿåº¦ï¼Œå¹¶é™åˆ¶å…¶æœ€å¤§é€Ÿåº¦
     for (i = 0; i < 4; i++)
     {
         chassis_move_control_loop->motor_chassis[i].speed_set = wheel_speed[i];
@@ -616,18 +616,18 @@ static void chassis_control_loop(chassis_move_t *chassis_move_control_loop)
     }
 
     //calculate pid
-    //¼ÆËãpid
+    //è®¡ç®—pid
     for (i = 0; i < 4; i++)
     {
         PID_calc(&chassis_move_control_loop->motor_speed_pid[i], chassis_move_control_loop->motor_chassis[i].speed, chassis_move_control_loop->motor_chassis[i].speed_set);
     }
 
 
-    //¹¦ÂÊ¿ØÖÆ
+    //åŠŸç‡æ§åˆ¶
     chassis_power_control(chassis_move_control_loop);
 
 
-    //¸³ÖµµçÁ÷Öµ
+    //èµ‹å€¼ç”µæµå€¼
     for (i = 0; i < 4; i++)
     {
         chassis_move_control_loop->motor_chassis[i].give_current = (int16_t)(chassis_move_control_loop->motor_speed_pid[i].out);
