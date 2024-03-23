@@ -131,19 +131,19 @@ int16_t shoot_control_loop(void)
     }
     else if(shoot_control.shoot_mode ==SHOOT_READY_BULLET)
     {
-        if(shoot_control.key == SWITCH_TRIGGER_OFF)
-        {
-            //设置拨弹轮的拨动速度,并开启堵转反转处理
-            shoot_control.trigger_speed_set = READY_TRIGGER_SPEED;
-            trigger_motor_turn_back();
-        }
-        else
-        {
+        // if(shoot_control.key == SWITCH_TRIGGER_OFF)
+        // {
+        //     //设置拨弹轮的拨动速度,并开启堵转反转处理
+        //     shoot_control.trigger_speed_set = READY_TRIGGER_SPEED;
+        //     trigger_motor_turn_back();
+        // }
+        // else
+        // {
             shoot_control.trigger_speed_set = 0.0f;
             shoot_control.speed_set = 0.0f;
-        }
-        shoot_control.trigger_motor_pid.max_out = TRIGGER_READY_PID_MAX_OUT;
-        shoot_control.trigger_motor_pid.max_iout = TRIGGER_READY_PID_MAX_IOUT;
+        // }
+        // shoot_control.trigger_motor_pid.max_out = TRIGGER_READY_PID_MAX_OUT;
+        // shoot_control.trigger_motor_pid.max_iout = TRIGGER_READY_PID_MAX_IOUT;
     }
     else if (shoot_control.shoot_mode == SHOOT_READY)
     {
@@ -236,44 +236,60 @@ static void shoot_set_mode(void)
     {
         shoot_control.shoot_mode = SHOOT_READY;
     }
-    else if(shoot_control.shoot_mode == SHOOT_READY)
-    {
-        //下拨一次或者鼠标按下一次，进入射击状态
-        if ((switch_is_down(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !switch_is_down(last_s)) || (shoot_control.press_l && shoot_control.last_press_l == 0) || (shoot_control.press_r && shoot_control.last_press_r == 0))
-        {
-            shoot_control.shoot_mode = SHOOT_BULLET;
-        }
-    }
-    else if(shoot_control.shoot_mode == SHOOT_DONE)
-    {
-        if(shoot_control.key == SWITCH_TRIGGER_OFF)
-        {
-            shoot_control.key_time++;
-            if(shoot_control.key_time > SHOOT_DONE_KEY_OFF_TIME)
-            {
-                shoot_control.key_time = 0;
-                shoot_control.shoot_mode = SHOOT_READY_BULLET;
-            }
-        }
-        else
-        {
-            shoot_control.key_time = 0;
-            shoot_control.shoot_mode = SHOOT_BULLET;
-        }
-    }
+    // else if(shoot_control.shoot_mode == SHOOT_READY)
+    // {
+    //     //下拨一次或者鼠标按下一次，进入射击状态
+    //     if ((switch_is_down(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL]) && !switch_is_down(last_s)) || (shoot_control.press_l && shoot_control.last_press_l == 0) || (shoot_control.press_r && shoot_control.last_press_r == 0))
+    //     {
+    //         shoot_control.shoot_mode = SHOOT_BULLET;
+    //     }
+    // }
+    // else if(shoot_control.shoot_mode == SHOOT_DONE)
+    // {
+    //     if(shoot_control.key == SWITCH_TRIGGER_OFF)
+    //     {
+    //         shoot_control.key_time++;
+    //         if(shoot_control.key_time > SHOOT_DONE_KEY_OFF_TIME)
+    //         {
+    //             shoot_control.key_time = 0;
+    //             shoot_control.shoot_mode = SHOOT_READY_BULLET;
+    //         }
+    //     }
+    //     else
+    //     {
+    //         shoot_control.key_time = 0;
+    //         shoot_control.shoot_mode = SHOOT_BULLET;
+    //     }
+    // }
     
 
 
-    if(shoot_control.shoot_mode > SHOOT_READY_FRIC)
+    // if(shoot_control.shoot_mode > SHOOT_READY_FRIC)
+    // {
+    //     //鼠标长按一直进入射击状态 保持连发
+    //     if ((shoot_control.press_l_time == PRESS_LONG_TIME) || (shoot_control.press_r_time == PRESS_LONG_TIME) || (shoot_control.rc_s_time == RC_S_LONG_TIME))
+    //     {
+    //         shoot_control.shoot_mode = SHOOT_CONTINUE_BULLET;
+    //     }
+    //     else if(shoot_control.shoot_mode == SHOOT_CONTINUE_BULLET)
+    //     {
+    //         shoot_control.shoot_mode =SHOOT_READY_BULLET;
+    //     }
+    // }
+
+    //修改为: 长按鼠标左键进入连发模式,松开则停止射击  
+    if(shoot_control.shoot_mode == SHOOT_READY)
     {
-        //鼠标长按一直进入射击状态 保持连发
-        if ((shoot_control.press_l_time == PRESS_LONG_TIME) || (shoot_control.press_r_time == PRESS_LONG_TIME) || (shoot_control.rc_s_time == RC_S_LONG_TIME))
+        if (shoot_control.press_l || (switch_is_down(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL])))
         {
             shoot_control.shoot_mode = SHOOT_CONTINUE_BULLET;
         }
-        else if(shoot_control.shoot_mode == SHOOT_CONTINUE_BULLET)
+    }
+    else if(shoot_control.shoot_mode == SHOOT_CONTINUE_BULLET)
+    {
+        if(!shoot_control.press_l || !(switch_is_down(shoot_control.shoot_rc->rc.s[SHOOT_RC_MODE_CHANNEL])))
         {
-            shoot_control.shoot_mode =SHOOT_READY_BULLET;
+            shoot_control.shoot_mode = SHOOT_READY_FRIC;
         }
     }
 
