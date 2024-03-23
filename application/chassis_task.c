@@ -267,11 +267,12 @@ static void chassis_init(chassis_move_t *chassis_move_init)
 
     //max and min speed
     //最大 最小速度
-  chassis_move_init->vx_max_speed = NORMAL_MAX_CHASSIS_SPEED_X * 0.5;
-    chassis_move_init->vx_min_speed = -NORMAL_MAX_CHASSIS_SPEED_X;
+    // the vx and vy here seems to be reversed..
+  chassis_move_init->vx_max_speed = NORMAL_MAX_CHASSIS_SPEED_X * 0.4;
+    chassis_move_init->vx_min_speed = -NORMAL_MAX_CHASSIS_SPEED_X * 0.4;
 
-  chassis_move_init->vy_max_speed = NORMAL_MAX_CHASSIS_SPEED_Y * 0.5;
-    chassis_move_init->vy_min_speed = -NORMAL_MAX_CHASSIS_SPEED_Y;
+  chassis_move_init->vy_max_speed = NORMAL_MAX_CHASSIS_SPEED_Y * 0.6;
+    chassis_move_init->vy_min_speed = -NORMAL_MAX_CHASSIS_SPEED_Y * 0.6;
 
     //update data
     //更新一下数据
