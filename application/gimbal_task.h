@@ -106,7 +106,7 @@
 #define PITCH_RC_SEN  -0.000006f //0.005
 
 #define YAW_MOUSE_SEN   0.00005f
-#define PITCH_MOUSE_SEN 0.00015f
+#define PITCH_MOUSE_SEN 0.00005f // was 15 before
 
 #define YAW_ENCODE_SEN    0.01f
 #define PITCH_ENCODE_SEN  0.01f
@@ -160,7 +160,7 @@
 typedef enum
 {
     GIMBAL_MOTOR_RAW = 0, //电机原始值控制
-    GIMBAL_MOTOR_GYRO,    //电机陀螺仪角度控制
+    GIMBAL_MOTOR_GYRO,    //电机陀螺仪角度控制sen
     GIMBAL_MOTOR_ENCONDE, //电机编码值角度控制
 } gimbal_motor_mode_e;
 
