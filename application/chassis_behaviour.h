@@ -95,8 +95,12 @@ typedef enum
                                         //如果有底盘陀螺仪请更新底盘的yaw，pitch，roll角度 在chassis_feedback_update函数中
   CHASSIS_NO_FOLLOW_YAW,                //chassis does not follow angle, angle is open-loop,but wheels have closed-loop speed
                                         //底盘不跟随角度，角度是开环的，但轮子是有速度环
-  CHASSIS_OPEN                          //the value of remote control will mulitiply a value, get current value that will be sent to can bus
+  CHASSIS_OPEN,                          //the value of remote control will mulitiply a value, get current value that will be sent to can bus
                                         // 遥控器的值乘以比例成电流值 直接发送到can总线上
+  CHASSIS_SPIN_FOLLOW_GIMBAL                          // 小陀螺
+                                        // THE spinner mode
+
+        
 } chassis_behaviour_e;
 
 #define CHASSIS_OPEN_RC_SCALE 10 // in CHASSIS_OPEN mode, multiply the value. 在chassis_open 模型下，遥控器乘以该比例发送到can上

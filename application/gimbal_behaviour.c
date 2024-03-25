@@ -545,6 +545,20 @@ static void gimbal_behavour_set(gimbal_control_t *gimbal_mode_set)
         gimbal_behaviour = GIMBAL_ABSOLUTE_ANGLE;
     }
 
+    if (gimbal_mode_set->gimbal_rc_ctrl->mouse.press_r != 0)
+    {
+        gimbal_behaviour = GIMBAL_AUTO;
+    }
+    else
+    {
+        gimbal_behaviour = GIMBAL_ABSOLUTE_ANGLE;
+    }
+
+    if (switch_is_down(gimbal_mode_set->gimbal_rc_ctrl->rc.s[GIMBAL_MODE_CHANNEL]))
+    {
+        gimbal_behaviour = GIMBAL_ZERO_FORCE;
+    }
+
     if( toe_is_error(DBUS_TOE))
     {
         gimbal_behaviour = GIMBAL_ZERO_FORCE;
