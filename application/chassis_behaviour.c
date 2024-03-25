@@ -294,8 +294,11 @@ void chassis_behaviour_mode_set(chassis_move_t *chassis_move_mode)
     {
         chassis_move_mode->chassis_mode = CHASSIS_VECTOR_RAW;
     }
+  // else if (chassis_behaviour_mode == CHASSIS_INFANTRY_FOLLOW_GIMBAL_YAW) // spin
+  // {
+  //   chassis_move_mode->chassis_mode = CHASSIS_SPIN_FOLLOW_GIMBAL;
+  // }
 }
-
 
 /**
   * @brief          set control set-point. three movement param, according to difference control mode,
@@ -347,6 +350,23 @@ void chassis_behaviour_control_set(fp32 *vx_set, fp32 *vy_set, fp32 *angle_set, 
     {
         chassis_open_set_control(vx_set, vy_set, angle_set, chassis_move_rc_to_vector);
     }
+  // else if (chassis_behaviour_mode == CHASSIS_SPIN_FOLLOW_GIMBAL)
+  // {
+
+  //   // fp32 vx_set = 0.0f, vy_set = 0.0f, angle_set = 0.0f;
+  //   // //get three control set-point, 获取三个控制设置值
+  //   // chassis_behaviour_control_set(&vx_set, &vy_set, &angle_set, chassis_move_rc_to_vector);
+
+  //   fp32 sin_yaw = 0.0f, cos_yaw = 0.0f;
+  //   // rotate chassis direction, make sure vertial direction follow gimbal
+  //   // 旋转控制底盘速度方向，保证前进方向是云台方向，有利于运动平稳
+  //   sin_yaw = arm_sin_f32(-chassis_move_rc_to_vector->chassis_yaw_motor->relative_angle);
+  //   cos_yaw = arm_cos_f32(-chassis_move_rc_to_vector->chassis_yaw_motor->relative_angle);
+  //   chassis_move_rc_to_vector->vx_set = cos_yaw * vx_set + sin_yaw * vy_set;
+  //   chassis_move_rc_to_vector->vy_set = -sin_yaw * vx_set + cos_yaw * vy_set;
+
+  //   chassis_move_rc_to_vector->wz_set = 2.0f;
+  // }
 }
 
 /**
@@ -454,9 +474,9 @@ static void chassis_infantry_follow_gimbal_yaw_control(fp32 *vx_set, fp32 *vy_se
     
     static uint8_t swing_flag = 0;
 
-    //judge if swing
-    //判断是否要摇摆
-    if (chassis_move_rc_to_vector->chassis_RC->key.v & SWING_KEY)
+  // judge if swing
+  // 判断是否要摇摆
+  if ((chassis_move_rc_to_vector->chassis_RC->key.v & SWING_KEY) || (switch_is_up(chassis_move_rc_to_vector->chassis_RC->rc.s[CHASSIS_MODE_CHANNEL])))
     {
         if (swing_flag == 0)
         {
@@ -483,7 +503,7 @@ static void chassis_infantry_follow_gimbal_yaw_control(fp32 *vx_set, fp32 *vy_se
     
     if (swing_flag)
     {
-        swing_angle = max_angle * arm_sin_f32(swing_time);
+    swing_angle = 0.6f; // no swing, the barral is in the mid of two armor board now
         swing_time += add_time;
     }
     else
@@ -496,7 +516,6 @@ static void chassis_infantry_follow_gimbal_yaw_control(fp32 *vx_set, fp32 *vy_se
     {
         swing_time -= 2 * PI;
     }
-
 
     *angle_set = swing_angle;
 }
