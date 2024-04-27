@@ -877,16 +877,7 @@ static void gimbal_auto_control(float *yaw, float *pitch, gimbal_control_t *gimb
     {
         cv_Data.new_cv_data_flag = 0;
         auto_yaw = gimbal_control_set->gimbal_yaw_motor.absolute_angle - cv_Data.yaw;
-
-        // testing: if pitch < 0, then scale the auto_pitch by 1.1
-        if (cv_Data.pitch > 0)
-        {
-            auto_pitch = gimbal_control_set->gimbal_pitch_motor.absolute_angle - cv_Data.pitch;
-        }
-        else
-        {
-            auto_pitch = gimbal_control_set->gimbal_pitch_motor.absolute_angle - cv_Data.pitch;
-        }
+        auto_pitch = gimbal_control_set->gimbal_pitch_motor.absolute_angle - cv_Data.pitch;
 
     }
 
