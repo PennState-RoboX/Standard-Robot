@@ -545,7 +545,7 @@ static void gimbal_behavour_set(gimbal_control_t *gimbal_mode_set)
         gimbal_behaviour = GIMBAL_ABSOLUTE_ANGLE;
     }
 
-    if (gimbal_mode_set->gimbal_rc_ctrl->mouse.press_r != 0)
+    if (switch_is_mid(gimbal_mode_set->gimbal_rc_ctrl->rc.s[GIMBAL_MODE_CHANNEL]) || gimbal_mode_set->gimbal_rc_ctrl->mouse.press_r != 0)
     {
         gimbal_behaviour = GIMBAL_AUTO;
     }
