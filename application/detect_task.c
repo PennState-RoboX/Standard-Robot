@@ -191,7 +191,11 @@ void detect_task(void const *pvParameters)
   */
 bool_t toe_is_error(uint8_t toe)
 {
-    return (error_list[toe].error_exist == 1);
+    //TEST NEEDED
+    //comment out the following code allow to turn of the error alarm. 
+
+    return 0
+    //return (error_list[toe].error_exist == 1);
 }
 
 /**
