@@ -313,31 +313,37 @@ static int16_t yaw_can_set_current = 0, pitch_can_set_current = 0, shoot_can_set
 
 void gimbal_task(void const *pvParameters)
 {
-  // 等待陀螺仪任务更新陀螺仪数据
-  // wait a time
-  vTaskDelay(GIMBAL_TASK_INIT_TIME);
-  // gimbal init
-  // 云台初始化
-  gimbal_init(&gimbal_control);
-  // shoot init
-  // 射击初始化
-  shoot_init();
-  // wait for all motor online
-  // 判断电机是否都上线
-  while (toe_is_error(YAW_GIMBAL_MOTOR_TOE) || toe_is_error(PITCH_GIMBAL_MOTOR_TOE))
-  {
-    vTaskDelay(GIMBAL_CONTROL_TIME);
-    gimbal_feedback_update(&gimbal_control); // 云台数据反馈
-  }
+    //等待陀螺仪任务更新陀螺仪数据
+    //wait a time
+    vTaskDelay(GIMBAL_TASK_INIT_TIME);
+    //gimbal init
+    //云台初始化
+    gimbal_init(&gimbal_control);
+    //shoot init
+    //射击初始化
+    shoot_init();
+ /*
+      TEST NEEDED
+      Comment out the following code would allow gimbal to work with some disconnected motors
+    */
 
-  while (1)
-  {
-    gimbal_set_mode(&gimbal_control);                    // 设置云台控制模式
-    gimbal_mode_change_control_transit(&gimbal_control); // 控制模式切换 控制数据过渡
-    gimbal_feedback_update(&gimbal_control);             // 云台数据反馈
-    gimbal_set_control(&gimbal_control);                 // 设置云台控制量
-    gimbal_control_loop(&gimbal_control);                // 云台控制PID计算
-    shoot_can_set_current = shoot_control_loop();        // 射击任务控制循环
+    //wait for all motor online
+    //判断电机是否都上线?
+    //while (toe_is_error(YAW_GIMBAL_MOTOR_TOE) || toe_is_error(PITCH_GIMBAL_MOTOR_TOE))
+    //{
+    //    vTaskDelay(GIMBAL_CONTROL_TIME);
+    //    gimbal_feedback_update(&gimbal_control);             //云台数据反馈
+    //}
+
+    while (1)
+    {
+        gimbal_set_mode(&gimbal_control);                    //设置云台控制模式
+        gimbal_mode_change_control_transit(&gimbal_control); //控制模式切换 控制数据过渡
+        gimbal_feedback_update(&gimbal_control);             //云台数据反馈
+        gimbal_set_control(&gimbal_control);                 //设置云台控制量
+        gimbal_control_loop(&gimbal_control);                //云台控制PID计算
+        shoot_can_set_current = shoot_control_loop();        //射击任务控制循环
+
 
 #if YAW_TURN
     yaw_can_set_current = -gimbal_control.gimbal_yaw_motor.given_current;
@@ -351,17 +357,22 @@ void gimbal_task(void const *pvParameters)
     pitch_can_set_current = gimbal_control.gimbal_pitch_motor.given_current;
 #endif
 
-    if (!(toe_is_error(YAW_GIMBAL_MOTOR_TOE) && toe_is_error(PITCH_GIMBAL_MOTOR_TOE) && toe_is_error(TRIGGER_MOTOR_TOE)))
-    {
-      if (toe_is_error(DBUS_TOE))
-      {
-        CAN_cmd_gimbal(0, 0, 0, 0);
-      }
-      else
-      {
-        CAN_cmd_gimbal(yaw_can_set_current, pitch_can_set_current, shoot_can_set_current, 0);
-      }
-    }
+        if (!(toe_is_error(YAW_GIMBAL_MOTOR_TOE) && toe_is_error(PITCH_GIMBAL_MOTOR_TOE) && toe_is_error(TRIGGER_MOTOR_TOE)))
+        {
+            /*
+                TEST NEEDED
+                Comment out the following code would make can still work even when motor errors are detected
+            */
+            //if (toe_is_error(DBUS_TOE))
+            //{
+            //    CAN_cmd_gimbal(0, 0, 0, 0);
+            //}
+            //else
+            //{
+                CAN_cmd_gimbal(yaw_can_set_current, pitch_can_set_current, shoot_can_set_current, 0);
+            //}
+        }
+
 
 #if GIMBAL_TEST_MODE
     J_scope_gimbal_test();
