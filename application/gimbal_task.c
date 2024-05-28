@@ -305,6 +305,12 @@ static int16_t yaw_can_set_current = 0, pitch_can_set_current = 0, shoot_can_set
 
 static fp32 yaw_set_angle = 0;
 static fp32 pitch_set_angle = 0;
+static int16_t pitch_current_set = 0;
+
+static fp32 pitch_speed_pid_POUT = 0;
+static fp32 pitch_speed_pid_IOUT = 0;
+static fp32 pitch_speed_pid_DOUT = 0;
+
 /**************************************************/
 
 /**
@@ -353,8 +359,10 @@ void gimbal_task(void const *pvParameters)
 #endif
 
 #if PITCH_TURN
+    pitch_current_set = -gimbal_control.gimbal_pitch_motor.given_current;
     pitch_can_set_current = -gimbal_control.gimbal_pitch_motor.given_current;
 #else
+    pitch_current_set = gimbal_control.gimbal_pitch_motor.given_current;
     pitch_can_set_current = gimbal_control.gimbal_pitch_motor.given_current;
 #endif
 
@@ -1030,7 +1038,23 @@ static void gimbal_control_loop(gimbal_control_t *control_loop)
   else if (control_loop->gimbal_pitch_motor.gimbal_motor_mode == GIMBAL_MOTOR_GYRO)
   {
     pitch_set_angle = control_loop->gimbal_pitch_motor.absolute_angle_set;
-    gimbal_motor_absolute_angle_control(&control_loop->gimbal_pitch_motor);
+
+    control_loop->gimbal_pitch_motor.motor_gyro_set = gimbal_PID_calc(&control_loop->gimbal_pitch_motor.gimbal_motor_absolute_angle_pid,
+                                                                      control_loop->gimbal_pitch_motor.absolute_angle,
+                                                                      control_loop->gimbal_pitch_motor.absolute_angle_set,
+                                                                      control_loop->gimbal_pitch_motor.motor_gyro);
+
+    control_loop->gimbal_pitch_motor.current_set = PID_calc(&control_loop->gimbal_pitch_motor.gimbal_motor_gyro_pid,
+                                                            control_loop->gimbal_pitch_motor.motor_gyro,
+                                                            control_loop->gimbal_pitch_motor.motor_gyro_set);
+
+    pitch_speed_pid_POUT = control_loop->gimbal_pitch_motor.gimbal_motor_gyro_pid.Pout;
+    pitch_speed_pid_IOUT = control_loop->gimbal_pitch_motor.gimbal_motor_gyro_pid.Iout;
+    pitch_speed_pid_DOUT = control_loop->gimbal_pitch_motor.gimbal_motor_gyro_pid.Dout;
+
+    // pitch_current_set = control_loop->gimbal_pitch_motor.given_current;
+
+    control_loop->gimbal_pitch_motor.given_current = (int16_t)(control_loop->gimbal_pitch_motor.current_set);
   }
   else if (control_loop->gimbal_pitch_motor.gimbal_motor_mode == GIMBAL_MOTOR_ENCONDE)
   {
