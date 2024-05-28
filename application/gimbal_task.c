@@ -300,6 +300,13 @@ extern gimbal_behaviour_e gimbal_behaviour;
 // 发送的电机电流
 static int16_t yaw_can_set_current = 0, pitch_can_set_current = 0, shoot_can_set_current = 0;
 
+/***************************************************/
+// Create Global Variable to show variable values in real time in KEIL 5 IDE
+
+static fp32 yaw_set_angle = 0;
+static fp32 pitch_set_angle = 0;
+/**************************************************/
+
 /**
  * @brief          gimbal task, osDelay GIMBAL_CONTROL_TIME (1ms)
  * @param[in]      pvParameters: null
@@ -1001,6 +1008,7 @@ static void gimbal_control_loop(gimbal_control_t *control_loop)
   }
   else if (control_loop->gimbal_yaw_motor.gimbal_motor_mode == GIMBAL_MOTOR_GYRO)
   {
+    yaw_set_angle = control_loop->gimbal_yaw_motor.absolute_angle_set;
     gimbal_motor_absolute_angle_control(&control_loop->gimbal_yaw_motor);
   }
   else if (control_loop->gimbal_yaw_motor.gimbal_motor_mode == GIMBAL_MOTOR_ENCONDE)
@@ -1021,7 +1029,7 @@ static void gimbal_control_loop(gimbal_control_t *control_loop)
   }
   else if (control_loop->gimbal_pitch_motor.gimbal_motor_mode == GIMBAL_MOTOR_GYRO)
   {
-
+    pitch_set_angle = control_loop->gimbal_pitch_motor.absolute_angle_set;
     gimbal_motor_absolute_angle_control(&control_loop->gimbal_pitch_motor);
   }
   else if (control_loop->gimbal_pitch_motor.gimbal_motor_mode == GIMBAL_MOTOR_ENCONDE)
