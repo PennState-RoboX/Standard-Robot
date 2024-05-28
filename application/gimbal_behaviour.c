@@ -559,10 +559,17 @@ static void gimbal_behavour_set(gimbal_control_t *gimbal_mode_set)
         gimbal_behaviour = GIMBAL_ZERO_FORCE;
     }
 
-    if( toe_is_error(DBUS_TOE))
-    {
-        gimbal_behaviour = GIMBAL_ZERO_FORCE;
-    }
+    /*
+        TEST NEEDED
+        Comment out the following allow to test gimbal system even with some disconnected motors.
+    
+    */
+    
+    //if( toe_is_error(DBUS_TOE))
+    //{
+    //    gimbal_behaviour = GIMBAL_ZERO_FORCE;
+    //}
+
 
     //enter init mode
     //ÅÐ¶Ï½øÈëinit×´Ì¬»ú
