@@ -35,10 +35,10 @@
   * @param output   Processed output value. Set to zero if within deadband range.
   * @param deadline Deadband threshold value. Initial value is 10.
   *
-  * @brief          处理遥控器输入的死区问题。忽略摇杆中心附近的小幅移动�?
-  * @param input    遥控器的原始输入值�?
-  * @param output   处理后的输出值。在死区范围内时设为零�?
-  * @param deadline 死区的阈值。初始值设�?10�?
+  * @brief          处理遥控器输入的死区问题。忽略摇杆中心附近的小幅移动。
+  * @param input    遥控器的原始输入值。
+  * @param output   处理后的输出值。在死区范围内时设为零。
+  * @param deadline 死区的阈值。初始值设为10。
   */
 #define rc_deadband_limit(input, output, dealine)        \
     {                                                    \
@@ -60,7 +60,7 @@
   * @retval         none
   */
 /**
-  * @brief          初始�?"chassis_move"变量，包括pid初始化， 遥控器指针初始化�?3508底盘电机指针初始化，云台电机初始化，陀螺仪角度指针初始�?
+  * @brief          初始化"chassis_move"变量，包括pid初始化， 遥控器指针初始化，3508底盘电机指针初始化，云台电机初始化，陀螺仪角度指针初始化
   * @param[out]     chassis_move_init:"chassis_move"变量指针.
   * @retval         none
   */
@@ -72,7 +72,7 @@ static void chassis_init(chassis_move_t *chassis_move_init);
   * @retval         none
   */
 /**
-  * @brief          设置底盘控制模式，主要在'chassis_behaviour_mode_set'函数中改�?
+  * @brief          设置底盘控制模式，主要在'chassis_behaviour_mode_set'函数中改变
   * @param[out]     chassis_move_mode:"chassis_move"变量指针.
   * @retval         none
   */
@@ -90,7 +90,7 @@ static void chassis_set_mode(chassis_move_t *chassis_move_mode);
   */
 void chassis_mode_change_control_transit(chassis_move_t *chassis_move_transit);
 /**
-  * @brief          chassis some measure data updata, such as motor speed, euler angle�? robot speed
+  * @brief          chassis some measure data updata, such as motor speed, euler angle， robot speed
   * @param[out]     chassis_move_update: "chassis_move" valiable point
   * @retval         none
   */
@@ -140,31 +140,24 @@ chassis_move_t chassis_move;
   * @retval         none
   */
 /**
-  * @brief          底盘任务，间�? CHASSIS_CONTROL_TIME_MS 2ms
-  * @param[in]      pvParameters: �?
+  * @brief          底盘任务，间隔 CHASSIS_CONTROL_TIME_MS 2ms
+  * @param[in]      pvParameters: 空
   * @retval         none
   */
 void chassis_task(void const *pvParameters)
 {
     //wait a time 
-    //空闲一段时�?
+    //空闲一段时间
     vTaskDelay(CHASSIS_TASK_INIT_TIME);
     //chassis init
-    //底盘初始�?
+    //底盘初始化
     chassis_init(&chassis_move);
     //make sure all chassis motor is online,
-    //判断底盘电机是否都在�?
-    
-    /*  
-        TEST NEEDED
-        Comment out the following three lines. The code disables chassis motor work individually. 
-        By commenting out those code, chassis motor can now spinning by itself.
-    */
-
-    //while (toe_is_error(CHASSIS_MOTOR1_TOE) || toe_is_error(CHASSIS_MOTOR2_TOE) || toe_is_error(CHASSIS_MOTOR3_TOE) || toe_is_error(CHASSIS_MOTOR4_TOE) || toe_is_error(DBUS_TOE))
-    //{
-    //    vTaskDelay(CHASSIS_CONTROL_TIME_MS);
-    //}
+    //判断底盘电机是否都在线
+    while (toe_is_error(CHASSIS_MOTOR1_TOE) || toe_is_error(CHASSIS_MOTOR2_TOE) || toe_is_error(CHASSIS_MOTOR3_TOE) || toe_is_error(CHASSIS_MOTOR4_TOE) || toe_is_error(DBUS_TOE))
+    {
+        vTaskDelay(CHASSIS_CONTROL_TIME_MS);
+    }
 
     while (1)
     {
@@ -178,36 +171,30 @@ void chassis_task(void const *pvParameters)
         //底盘数据更新
         chassis_feedback_update(&chassis_move);
         //set chassis control set-point 
-        //底盘控制量设�?
+        //底盘控制量设置
         chassis_set_contorl(&chassis_move);
         //chassis control pid calculate
         //底盘控制PID计算
         chassis_control_loop(&chassis_move);
 
-        
-      /* 
-        TEST NEEDED
-        Comment out the following code allow team to test gimbal and shooting system without plugin the chassis motors
-      */
-
         //make sure  one motor is online at least, so that the control CAN message can be received
-        //确保至少一个电机在线， 这样CAN控制包可以被接收�?
-        //if (!(toe_is_error(CHASSIS_MOTOR1_TOE) && toe_is_error(CHASSIS_MOTOR2_TOE) && toe_is_error(CHASSIS_MOTOR3_TOE) && toe_is_error(CHASSIS_MOTOR4_TOE)))
-        //{
-            ////when remote control is offline, chassis motor should receive zero current. 
-            ////当遥控器掉线的时候，发送给底盘电机零电�?.
-            //if (toe_is_error(DBUS_TOE))
-            //{
-                //CAN_cmd_chassis(0, 0, 0, 0);
-            //}
-            //else
-            //{
+        //确保至少一个电机在线， 这样CAN控制包可以被接收到
+        if (!(toe_is_error(CHASSIS_MOTOR1_TOE) && toe_is_error(CHASSIS_MOTOR2_TOE) && toe_is_error(CHASSIS_MOTOR3_TOE) && toe_is_error(CHASSIS_MOTOR4_TOE)))
+        {
+            //when remote control is offline, chassis motor should receive zero current. 
+            //当遥控器掉线的时候，发送给底盘电机零电流.
+            if (toe_is_error(DBUS_TOE))
+            {
+                CAN_cmd_chassis(0, 0, 0, 0);
+            }
+            else
+            {
                 //send control current
-                //发送控制电�?
+                //发送控制电流
                 CAN_cmd_chassis(chassis_move.motor_chassis[0].give_current, chassis_move.motor_chassis[1].give_current,
                                 chassis_move.motor_chassis[2].give_current, chassis_move.motor_chassis[3].give_current);
-            //}
-        //}
+            }
+        }
         //os delay
         //系统延时
         vTaskDelay(CHASSIS_CONTROL_TIME_MS);
@@ -225,7 +212,7 @@ void chassis_task(void const *pvParameters)
   * @retval         none
   */
 /**
-  * @brief          初始�?"chassis_move"变量，包括pid初始化， 遥控器指针初始化�?3508底盘电机指针初始化，云台电机初始化，陀螺仪角度指针初始�?
+  * @brief          初始化"chassis_move"变量，包括pid初始化， 遥控器指针初始化，3508底盘电机指针初始化，云台电机初始化，陀螺仪角度指针初始化
   * @param[out]     chassis_move_init:"chassis_move"变量指针.
   * @retval         none
   */
@@ -237,22 +224,22 @@ static void chassis_init(chassis_move_t *chassis_move_init)
     }
 
     //chassis motor speed PID
-    //底盘速度环pid�?
+    //底盘速度环pid值
     const static fp32 motor_speed_pid[3] = {M3505_MOTOR_SPEED_PID_KP, M3505_MOTOR_SPEED_PID_KI, M3505_MOTOR_SPEED_PID_KD};
     
     //chassis angle PID
-    //底盘角度pid�?
+    //底盘角度pid值
     const static fp32 chassis_yaw_pid[3] = {CHASSIS_FOLLOW_GIMBAL_PID_KP, CHASSIS_FOLLOW_GIMBAL_PID_KI, CHASSIS_FOLLOW_GIMBAL_PID_KD};
     
     const static fp32 chassis_x_order_filter[1] = {CHASSIS_ACCEL_X_NUM};
     const static fp32 chassis_y_order_filter[1] = {CHASSIS_ACCEL_Y_NUM};
     uint8_t i;
 
-    //in beginning�? chassis mode is raw 
+    //in beginning， chassis mode is raw 
     //底盘开机状态为原始
     chassis_move_init->chassis_mode = CHASSIS_VECTOR_RAW;
     //get remote control point
-    //获取遥控器指�?
+    //获取遥控器指针
     chassis_move_init->chassis_RC = get_remote_control_point();
     //get gyro sensor euler angle point
     //获取陀螺仪姿态角指针
@@ -274,12 +261,12 @@ static void chassis_init(chassis_move_t *chassis_move_init)
     PID_init(&chassis_move_init->chassis_angle_pid, PID_POSITION, chassis_yaw_pid, CHASSIS_FOLLOW_GIMBAL_PID_MAX_OUT, CHASSIS_FOLLOW_GIMBAL_PID_MAX_IOUT);
     
     //first order low-pass filter  replace ramp function
-    //用一阶滤波代替斜波函数生�?
+    //用一阶滤波代替斜波函数生成
     first_order_filter_init(&chassis_move_init->chassis_cmd_slow_set_vx, CHASSIS_CONTROL_TIME, chassis_x_order_filter);
     first_order_filter_init(&chassis_move_init->chassis_cmd_slow_set_vy, CHASSIS_CONTROL_TIME, chassis_y_order_filter);
 
     //max and min speed
-    //最�? 最小速度
+    //最大 最小速度
     // the vx and vy here seems to be reversed..
   chassis_move_init->vx_max_speed = NORMAL_MAX_CHASSIS_SPEED_X * 0.4;
     chassis_move_init->vx_min_speed = -NORMAL_MAX_CHASSIS_SPEED_X * 0.4;
@@ -288,7 +275,7 @@ static void chassis_init(chassis_move_t *chassis_move_init)
     chassis_move_init->vy_min_speed = -NORMAL_MAX_CHASSIS_SPEED_Y * 0.6;
 
     //update data
-    //更新一下数�?
+    //更新一下数据
     chassis_feedback_update(chassis_move_init);
 }
 
@@ -298,7 +285,7 @@ static void chassis_init(chassis_move_t *chassis_move_init)
   * @retval         none
   */
 /**
-  * @brief          设置底盘控制模式，主要在'chassis_behaviour_mode_set'函数中改�?
+  * @brief          设置底盘控制模式，主要在'chassis_behaviour_mode_set'函数中改变
   * @param[out]     chassis_move_mode:"chassis_move"变量指针.
   * @retval         none
   */
@@ -347,7 +334,7 @@ static void chassis_mode_change_control_transit(chassis_move_t *chassis_move_tra
         chassis_move_transit->chassis_yaw_set = chassis_move_transit->chassis_yaw;
     }
     //change to no follow angle
-    //切入不跟随云台模�?
+    //切入不跟随云台模式
     else if ((chassis_move_transit->last_chassis_mode != CHASSIS_VECTOR_NO_FOLLOW_YAW) && chassis_move_transit->chassis_mode == CHASSIS_VECTOR_NO_FOLLOW_YAW)
     {
         chassis_move_transit->chassis_yaw_set = chassis_move_transit->chassis_yaw;
@@ -357,7 +344,7 @@ static void chassis_mode_change_control_transit(chassis_move_t *chassis_move_tra
 }
 
 /**
-  * @brief          chassis some measure data updata, such as motor speed, euler angle�? robot speed
+  * @brief          chassis some measure data updata, such as motor speed, euler angle， robot speed
   * @param[out]     chassis_move_update: "chassis_move" valiable point
   * @retval         none
   */
@@ -383,13 +370,13 @@ static void chassis_feedback_update(chassis_move_t *chassis_move_update)
     }
 
     //calculate vertical speed, horizontal speed ,rotation speed, left hand rule 
-    //更新底盘纵向速度 x�? 平移速度y，旋转速度wz，坐标系为右手系
+    //更新底盘纵向速度 x， 平移速度y，旋转速度wz，坐标系为右手系
     chassis_move_update->vx = (-chassis_move_update->motor_chassis[0].speed + chassis_move_update->motor_chassis[1].speed + chassis_move_update->motor_chassis[2].speed - chassis_move_update->motor_chassis[3].speed) * MOTOR_SPEED_TO_CHASSIS_SPEED_VX;
     chassis_move_update->vy = (-chassis_move_update->motor_chassis[0].speed - chassis_move_update->motor_chassis[1].speed + chassis_move_update->motor_chassis[2].speed + chassis_move_update->motor_chassis[3].speed) * MOTOR_SPEED_TO_CHASSIS_SPEED_VY;
     chassis_move_update->wz = (-chassis_move_update->motor_chassis[0].speed - chassis_move_update->motor_chassis[1].speed - chassis_move_update->motor_chassis[2].speed - chassis_move_update->motor_chassis[3].speed) * MOTOR_SPEED_TO_CHASSIS_SPEED_WZ / MOTOR_DISTANCE_TO_CENTER;
 
     //calculate chassis euler angle, if chassis add a new gyro sensor,please change this code
-    //计算底盘姿态角�?, 如果底盘上有陀螺仪请更改这部分代码
+    //计算底盘姿态角度, 如果底盘上有陀螺仪请更改这部分代码
     chassis_move_update->chassis_yaw = rad_format(*(chassis_move_update->chassis_INS_angle + INS_YAW_ADDRESS_OFFSET) - chassis_move_update->chassis_yaw_motor->relative_angle);
     chassis_move_update->chassis_pitch = rad_format(*(chassis_move_update->chassis_INS_angle + INS_PITCH_ADDRESS_OFFSET) - chassis_move_update->chassis_pitch_motor->relative_angle);
     chassis_move_update->chassis_roll = *(chassis_move_update->chassis_INS_angle + INS_ROLL_ADDRESS_OFFSET);
@@ -420,7 +407,7 @@ void chassis_rc_to_control_vector(fp32 *vx_set, fp32 *vy_set, chassis_move_t *ch
     int16_t vx_channel, vy_channel;
     fp32 vx_set_channel, vy_set_channel;
     //deadline, because some remote control need be calibrated,  the value of rocker is not zero in middle place,
-    //死区限制，因为遥控器可能存在差异 摇杆在中间，其值不�?0
+    //死区限制，因为遥控器可能存在差异 摇杆在中间，其值不为0
     rc_deadband_limit(chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_X_CHANNEL], vx_channel, CHASSIS_RC_DEADLINE);
     rc_deadband_limit(chassis_move_rc_to_vector->chassis_RC->rc.ch[CHASSIS_Y_CHANNEL], vy_channel, CHASSIS_RC_DEADLINE);
 
@@ -452,7 +439,7 @@ void chassis_rc_to_control_vector(fp32 *vx_set, fp32 *vy_set, chassis_move_t *ch
     first_order_filter_cali(&chassis_move_rc_to_vector->chassis_cmd_slow_set_vx, vx_set_channel);
     first_order_filter_cali(&chassis_move_rc_to_vector->chassis_cmd_slow_set_vy, vy_set_channel);
     //stop command, need not slow change, set zero derectly
-    //停止信号，不需要缓慢加速，直接减速到�?
+    //停止信号，不需要缓慢加速，直接减速到零
     if (vx_set_channel < CHASSIS_RC_DEADLINE * CHASSIS_VX_RC_SEN && vx_set_channel > -CHASSIS_RC_DEADLINE * CHASSIS_VX_RC_SEN)
     {
         chassis_move_rc_to_vector->chassis_cmd_slow_set_vx.out = 0.0f;
@@ -472,7 +459,7 @@ void chassis_rc_to_control_vector(fp32 *vx_set, fp32 *vy_set, chassis_move_t *ch
   * @retval         none
   */
 /**
-  * @brief          设置底盘控制设置�?, 三运动控制值是通过chassis_behaviour_control_set函数设置�?
+  * @brief          设置底盘控制设置值, 三运动控制值是通过chassis_behaviour_control_set函数设置的
   * @param[out]     chassis_move_update:"chassis_move"变量指针.
   * @retval         none
   */
@@ -486,7 +473,7 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control)
 
 
     fp32 vx_set = 0.0f, vy_set = 0.0f, angle_set = 0.0f;
-    //get three control set-point, 获取三个控制设置�?
+    //get three control set-point, 获取三个控制设置值
     chassis_behaviour_control_set(&vx_set, &vy_set, &angle_set, chassis_move_control);
 
     //follow gimbal mode
@@ -516,7 +503,7 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control)
     {
         fp32 delat_angle = 0.0f;
         //set chassis yaw angle set-point
-        //设置底盘控制的角�?
+        //设置底盘控制的角度
         chassis_move_control->chassis_yaw_set = rad_format(angle_set);
         delat_angle = rad_format(chassis_move_control->chassis_yaw_set - chassis_move_control->chassis_yaw);
         //calculate rotation speed
@@ -530,7 +517,7 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control)
     else if (chassis_move_control->chassis_mode == CHASSIS_VECTOR_NO_FOLLOW_YAW)
     {
         //"angle_set" is rotation speed set-point
-        //“angle_set�? 是旋转速度控制
+        //“angle_set” 是旋转速度控制
         chassis_move_control->wz_set = angle_set;
         chassis_move_control->vx_set = fp32_constrain(vx_set, chassis_move_control->vx_min_speed, chassis_move_control->vx_max_speed);
         chassis_move_control->vy_set = fp32_constrain(vy_set, chassis_move_control->vy_min_speed, chassis_move_control->vy_max_speed);
@@ -556,7 +543,7 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control)
   * @retval         none
   */
 /**
-  * @brief          四个麦轮速度是通过三个参数计算出来�?
+  * @brief          四个麦轮速度是通过三个参数计算出来的
   * @param[in]      vx_set: 纵向速度
   * @param[in]      vy_set: 横向速度
   * @param[in]      wz_set: 旋转速度
@@ -566,7 +553,7 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control)
 static void chassis_vector_to_mecanum_wheel_speed(const fp32 vx_set, const fp32 vy_set, const fp32 wz_set, fp32 wheel_speed[4])
 {
     //because the gimbal is in front of chassis, when chassis rotates, wheel 0 and wheel 1 should be slower and wheel 2 and wheel 3 should be faster
-    //旋转的时候， 由于云台靠前，所以是前面两轮 0 �?1 旋转的速度变慢�? 后面两轮 2,3 旋转的速度变快
+    //旋转的时候， 由于云台靠前，所以是前面两轮 0 ，1 旋转的速度变慢， 后面两轮 2,3 旋转的速度变快
     wheel_speed[0] = -vx_set - vy_set + (CHASSIS_WZ_SET_SCALE - 1.0f) * MOTOR_DISTANCE_TO_CENTER * wz_set;
     wheel_speed[1] = vx_set - vy_set + (CHASSIS_WZ_SET_SCALE - 1.0f) * MOTOR_DISTANCE_TO_CENTER * wz_set;
     wheel_speed[2] = vx_set + vy_set + (-CHASSIS_WZ_SET_SCALE - 1.0f) * MOTOR_DISTANCE_TO_CENTER * wz_set;
@@ -642,7 +629,7 @@ static void chassis_control_loop(chassis_move_t *chassis_move_control_loop)
     chassis_power_control(chassis_move_control_loop);
 
 
-    //赋值电流�?
+    //赋值电流值
     for (i = 0; i < 4; i++)
     {
         chassis_move_control_loop->motor_chassis[i].give_current = (int16_t)(chassis_move_control_loop->motor_speed_pid[i].out);
