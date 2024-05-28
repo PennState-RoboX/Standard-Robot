@@ -1,7 +1,6 @@
 #ifndef STRUCT_TYPEDEF_H
 #define STRUCT_TYPEDEF_H
 
-
 typedef signed char int8_t;
 typedef signed short int int16_t;
 typedef signed int int32_t;
@@ -16,8 +15,4 @@ typedef unsigned char bool_t;
 typedef float fp32;
 typedef double fp64;
 
-
 #endif
-
-
-

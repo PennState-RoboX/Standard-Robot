@@ -56,5 +56,12 @@
   "C_Cpp_Runner.useLeakSanitizer": false,
   "C_Cpp_Runner.showCompilationTime": false,
   "C_Cpp_Runner.useLinkTimeOptimization": false,
-  "C_Cpp_Runner.msvcSecureNoWarnings": false
+  "C_Cpp_Runner.msvcSecureNoWarnings": false,
+  "files.associations": {
+    "cmsis_os.h": "c",
+    "bsp_adc.h": "c",
+    "main.h": "c",
+    "struct_typedef.h": "c",
+    "usb_task.h": "c"
+  }
 }

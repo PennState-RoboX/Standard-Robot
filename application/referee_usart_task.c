@@ -2,7 +2,7 @@
   ****************************(C) COPYRIGHT 2019 DJI****************************
   * @file       referee_usart_task.c/h
   * @brief      RM referee system data solve. RM闂傚倸鍊峰ù鍥х暦閻㈢ǹ绐楃€广儱鎷�?〒濠�?��閻戞ɑ鈷掗柣�?炴閵嗘帒顫濋敐鍛闁诲氦�??ú鏍礊婵犲洤绠栭柛鎾楀倹鍕�?��鑺ッˇ浠�?��濞嗘挻鈷掑ù锝�?��鐢埖銇�?��锝嗙鐎规洘鍔曡灃闁告侗鍘藉Σ顒勬⒑缂佹ǘ缂氱紒顕呭灦閹€斥�?濡繐缍婇弫鎰板川椤旇�?鍓垫俊鐐€х紞鈧柛瀣姍閸┾偓妞ゆ帒鍠�?��鎰版煙閸濄儱鍘撮柟�?惧仱閺佸啴鍩�?��掑�?鏁�?柕澶嗘櫅缁€瀣亜閺嶃劍鐨戞い锔芥緲椤啴濡堕崱�?���?��佸摜�?��柊锝夊春閳ь剚銇勯幒鎴敾閻庢�?���?
-  * @note       
+  * @note
   * @history
   *  Version    Date            Author          Modification
   *  V1.0.0     Nov-11-2019     RM              1. done
@@ -15,9 +15,9 @@
   ****************************(C) COPYRIGHT 2019 DJI****************************
   */
 
- /**
-  * Modified the "RM referee system data solve" into CV_data receiving and processing
-  * Commented out the original referee_usart_task function and added the UART7_CommandRoute function
+/**
+ * Modified the "RM referee system data solve" into CV_data receiving and processing
+ * Commented out the original referee_usart_task function and added the UART7_CommandRoute function
  */
 
 #include "referee_usart_task.h"
@@ -35,20 +35,18 @@
 
 #include <stdbool.h> // Include this header to use bool type
 
-
 /**
-  * @brief          single byte upacked 
-  * @param[in]      void
-  * @retval         none
-  */
+ * @brief          single byte upacked
+ * @param[in]      void
+ * @retval         none
+ */
 /**
-  * @brief          闂傚倸鍊搁崐椋庣矆娓氣偓楠炲鏁撻悩顔瑰亾閸愵喖骞㈡俊鐐存�?濡炶棄�?ｆ�?瀣垫晣闁绘�?娓瑰Σ鎰版煟閻斿摜�??俊�?㈠暣閻涱喗绻濋崶銊モ偓鐑芥煕濠靛棗�?柨娑欑矊閳规垿�?��鑲╁姶闂佸憡鎸诲銊╁极椤曗偓閸ㄦ儳鐣烽崶銊︻啎闂備浇娉曢崳锕傚�?閿燂�??
-  * @param[in]      void
-  * @retval         none
-  */
+ * @brief          闂傚倸鍊搁崐椋庣矆娓氣偓楠炲鏁撻悩顔瑰亾閸愵喖骞㈡俊鐐存�?濡炶棄�?ｆ�?瀣垫晣闁绘�?娓瑰Σ鎰版煟閻斿摜�??俊�?㈠暣閻涱喗绻濋崶銊モ偓鐑芥煕濠靛棗�?柨娑欑矊閳规垿�?��鑲╁姶闂佸憡鎸诲銊╁极椤曗偓閸ㄦ儳鐣烽崶銊︻啎闂備浇娉曢崳锕傚�?閿燂�??
+ * @param[in]      void
+ * @retval         none
+ */
 static void referee_unpack_fifo_data(void);
 
- 
 extern UART_HandleTypeDef huart6;
 
 uint8_t usart6_buf[2][USART_RX_BUF_LENGHT];
@@ -61,7 +59,6 @@ char dma_buf[50];
 // 闂傚倸鍊搁崐鐑芥嚄閸洖纾块柣銏⑶圭壕濠�?��閹�?劦鍤欑紒鈧径鎰€甸柨婵嗛�?ф彃鈹戦鎸庣彧闁靛洤瀚伴�?��楀箣濠�?���?��紓鍌欒兌婵灚绻涙繝鍥ц摕闁哄洨鍠庣�?鐐�?箾閹存瑥鐏い搴＄Ч濮婃椽宕崟�?婄�?婵炲瓨绮犳�?顏勵嚕婵犳�?鏅插璺好￠埡鍛厪濠㈣泛鐗嗛崝婊堟煟閵堝懎鐨瑼闂傚倸鍊搁崐宄懊归崶褜娴�?��濞炬櫆閸ゅ�?鏌ょ粙璺ㄤ粵婵炲懐濮�?��濠囧Χ閸屾�?��曢梻浣�?串缁�?���?��璺虹闁告稑鐡ㄩ幆鐐烘煕閿旇�?��紒杈ㄥ▕�?���?���?��瀣秷闂佺ǹ�?哥�?顓熺珶閺囥埄鏁囬柕蹇曞Х椤旀垿�?虹捄銊ユ珢闁瑰嚖鎷�
 // DMA data buffer for reception
 unsigned char rx_data[50];
-
 
 /* 婵犵數濮烽弫鎼佸磻濞戙埄鏁�?い鎾跺枑閸欏繐霉閸忓吋缍戠痪�?�健閺岀喎鈻撻崹顔界亾缂備胶�?��Λ鍐蓟濞戞ǚ妲堟繛鍡樺姉缁�?��姊洪崨濠�?��闁挎洦浜濠氬Ω閳哄倸浜滈柣鐘叉处閻ｎ偊骞橀崜浣猴紲闁�?函缍嗘�?璺何熼埀顒勬⒑缁洘鏉归柛瀣�?��啴濡堕崱妤�?��闂佺厧鍟块悥濂�?春閵忋倕绫嶉柛顐ゅ枔閸欏�?姊虹紒妯烩拻闁�?簺鍊曢埢宥�?即閵忥紕鍘撻悷�?�?��瀹曟粌鈽夐�?鐘电枃闂佽宕橀�?鈧艾顦伴妵鍕箳閹存繍浠煎┑�?款潐閻擄繝�?婚妸銉㈡斀闁糕檧鏅滅瑧缂傚倷鑳舵慨�?��箾婵犲洤钃熼柡鍥╁枎缁剁偞绻涢幋娆忕仾�?ゅ�?绉瑰娲传閸曨剨绱炴繛瀛�?矤娴滎亜顕ｆ繝�?労闁告劏鏅涢鎾绘⒑閸涘﹦绠撻悗�?卞厴瀵娊顢橀姀鈥斥偓鐢告偡濞嗗繐�?悘蹇ｅ亞缁辨帡鎳滄担鍐�?闂佷�?��块崗姗€骞冮埡鍐╁珰闁圭�?��為悰鈺備繆閻愵亜鈧牠鎮уΔ鍐煓闁规崘顕уЧ鏌ユ煟濡偐甯涢柍閿�?灴閺屾稑鈹戦崱妤婁紑闁煎弶鐗犲娲川婵犲海鍔堕梺鎼炲劘閸斿秴鈻嶉�?銈嗏拺閻犳亽鍔屽▍鎰版煙閸戙倖瀚�? */
 /* 闂傚倸鍊搁崐椋庣矆娓氣偓楠炲鏁撻悩鍐蹭罕闂佸搫娲㈤崹鍦不閻�?绠规繛锝庡�?��＄厧顩奸崨瀛樷拺闁告繂瀚弳娆撴煟濡も偓閿曨亜顕ｉ弻銉晢闁告洦鍓涢崢�?��偡濠婂�?绠炴鐐�??閺佹捇鏁撻敓锟�55a闂傚倸鍊搁崐鐑芥倿閿旈敮鍋撶�?��樻噽閻瑩鏌熷▎鈥崇湴閸旀垿宕�?��顒併亜閹烘垵鈧崵澹曟總鍛婄厵闁�?���?��崕鎰版倵濮樼偓瀚�2闂傚倸鍊峰ù鍥敋瑜忛埀顒佺▓閺�?��鍒掑▎鎾崇婵＄偛鐨烽崑鎾�?礃閳轰胶绐為柣搴岛閺呮繄绮诲鑸�?拺閻犳亽鍔屽▍鎰版煙閸戙倖瀚� */
@@ -86,243 +83,249 @@ unsigned char rx_data[50];
 // define a complete packet
 uint8_t packet[CV_PACKET_LENGTH];
 
-
 /**
-  * @brief          referee task
-  * @param[in]      pvParameters: NULL
-  * @retval         none
-  */
+ * @brief          referee task
+ * @param[in]      pvParameters: NULL
+ * @retval         none
+ */
 /**
-  * @brief          闂傚倸鍊峰ù鍥х暦閻㈢ǹ绐楃€广儱鎷�?〒濠�?��閻戞ɑ鈷掗柣�?炴閵嗘帒顫濋敐鍛闁诲氦�??ú鏍礊婵犲洤绠栭柛鎾楀倹鍕�?��鑺ッˇ浠�?��濞嗘挻鈷掑ù锝�?��鐢埖銇�?��锝嗙鐎规洘鍔曡灃闁告侗鍘藉Σ顒勬⒑缂佹〒褰捤�?崱�?ヤ汗闁圭儤鎸告�?瑙勭箾閹�?��鍤柛銊︽緲閳绘捇顢橀悢铏�??濠电偛鐗嗛悘婵嗏枍濞嗘挻鐓欓柛鎴欏€�?��氾拷
-  * @param[in]      pvParameters: NULL
-  * @retval         none
-  */
-void referee_usart_task(void const * argument)
+ * @brief          闂傚倸鍊峰ù鍥х暦閻㈢ǹ绐楃€广儱鎷�?〒濠�?��閻戞ɑ鈷掗柣�?炴閵嗘帒顫濋敐鍛闁诲氦�??ú鏍礊婵犲洤绠栭柛鎾楀倹鍕�?��鑺ッˇ浠�?��濞嗘挻鈷掑ù锝�?��鐢埖銇�?��锝嗙鐎规洘鍔曡灃闁告侗鍘藉Σ顒勬⒑缂佹〒褰捤�?崱�?ヤ汗闁圭儤鎸告�?瑙勭箾閹�?��鍤柛銊︽緲閳绘捇顢橀悢铏�??濠电偛鐗嗛悘婵嗏枍濞嗘挻鐓欓柛鎴欏€�?��氾拷
+ * @param[in]      pvParameters: NULL
+ * @retval         none
+ */
+void referee_usart_task(void const *argument)
 {
 
   memset(dma_buf, 0, 200);
-	memset(rx_data, 0, 50);
-	const fp32* imu = get_INS_angle_point();
-	while(1){
-		sprintf((char *)dma_buf, "A5%f,%f,%f", imu[0],imu[1],imu[2]);
-	HAL_UART_Transmit_DMA(&huart6, (uint8_t*)dma_buf, strlen((const char*)dma_buf));
-	HAL_UART_Receive_DMA(&huart6, (uint8_t*)rx_data, sizeof(rx_data)); 
-		
-	}
+  memset(rx_data, 0, 50);
+  const fp32 *imu = get_INS_angle_point();
+  while (1)
+  {
+    sprintf((char *)dma_buf, "A5%f,%f,%f", imu[0], imu[1], imu[2]);
+    HAL_UART_Transmit_DMA(&huart6, (uint8_t *)dma_buf, strlen((const char *)dma_buf));
+    HAL_UART_Receive_DMA(&huart6, (uint8_t *)rx_data, sizeof(rx_data));
+  }
 }
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-    if (huart->Instance == USART6)  
-    {
-			//HAL_UART_Receive_DMA(&huart6, (uint8_t*)rx_rdata, 9);
-			HAL_UART_Transmit_DMA(&huart6, (uint8_t*)dma_buf, strlen((const char*)dma_buf));
-    }
-}
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) 
-{
-	if (huart->Instance == USART6)  
+  if (huart->Instance == USART6)
   {
-		UART7_CommandRoute(); 
-		HAL_UART_Receive_DMA(&huart6, (uint8_t*)rx_data, sizeof(rx_data));
-		
-	}
+    // HAL_UART_Receive_DMA(&huart6, (uint8_t*)rx_rdata, 9);
+    HAL_UART_Transmit_DMA(&huart6, (uint8_t *)dma_buf, strlen((const char *)dma_buf));
+  }
 }
 
-// use to find the first complete packet from rx_data, if find A5 and come with 5A, then 
-bool find_CpltPacket(void){
-  for (size_t i = 0; i < sizeof(rx_data); i++){
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if (huart->Instance == USART6)
+  {
+    UART7_CommandRoute();
+    HAL_UART_Receive_DMA(&huart6, (uint8_t *)rx_data, sizeof(rx_data));
+  }
+}
+
+// use to find the first complete packet from rx_data, if find A5 and come with 5A, then
+bool find_CpltPacket(void)
+{
+  for (size_t i = 0; i < sizeof(rx_data); i++)
+  {
     // find A55A
-    if (rx_data[i] == 0xA5 && rx_data[i+1] == 0x5A){
+    if (rx_data[i] == 0xA5 && rx_data[i + 1] == 0x5A)
+    {
       // find FF
-      if (rx_data[i+sizeof(packet)-1] == 0xFF){
+      if (rx_data[i + sizeof(packet) - 1] == 0xFF)
+      {
         // copy the packet
         memcpy(packet, &rx_data[i], sizeof(packet));
-				return true;
+        return true;
       }
     }
   }
-	return false;
+  return false;
 }
-
 
 cv_Data_TypeDef cv_Data;
-void UART7_CommandRoute(void){
-			// get a complete packet by checking the rx_data
-      bool packetFound = find_CpltPacket();
-
-			// If no complete packet was found, return early and skip the rest
-			if (!packetFound) {
-				return;
-			}
-      
-      HexToFloat yaw;
-      HexToFloat pitch;
-
-      // get Yaw
-      uint32_t temp_Yaw = (uint32_t)packet[3] << 24 |
-                          (uint32_t)packet[4] << 16 |
-                          (uint32_t)packet[5] << 8  |
-                          (uint32_t)packet[6];
-      yaw.hex = temp_Yaw;
-      cv_Data.yaw = yaw.floatValue;
-
-      // get Pitch
-      uint32_t temp_Pitch = (uint32_t)packet[7] << 24 |
-                            (uint32_t)packet[8] << 16 |
-                            (uint32_t)packet[9] << 8  |
-                            (uint32_t)packet[10];
-      pitch.hex = temp_Pitch;
-      cv_Data.pitch = pitch.floatValue;
-			
-			// get Find_Target status
-			cv_Data.find_target = (char)packet[12];
-
-      // get the new cv data flag
-      detect_hook(USER_USART_DATA_TOE);
-      cv_Data.new_cv_data_flag = 1;
-	}
-
-
-/**
-  * @brief          single byte upacked 
-  * @param[in]      void
-  * @retval         none
-  */
-/**
-  * @brief          闂傚倸鍊搁崐椋庣矆娓氣偓楠炲鏁撻悩顔瑰亾閸愵喖骞㈡俊鐐存�?濡炶棄�?ｆ�?瀣垫晣闁绘�?娓瑰Σ鎰版煟閻斿摜�??俊�?㈠暣閻涱喗绻濋崶銊モ偓鐑芥煕濠靛棗�?柨娑欑矊閳规垿�?��鑲╁姶闂佸憡鎸诲銊╁极椤曗偓閸ㄦ儳鐣烽崶銊︻啎闂備浇娉曢崳锕傚�?閿燂�??
-  * @param[in]      void
-  * @retval         none
-  */
-void referee_unpack_fifo_data(void)
+void UART7_CommandRoute(void)
 {
- uint8_t byte = 0;
- uint8_t sof = HEADER_SOF;
- unpack_data_t *p_obj = &referee_unpack_obj;
+  // get a complete packet by checking the rx_data
+  bool packetFound = find_CpltPacket();
 
- while ( fifo_s_used(&referee_fifo) )
- {
-   byte = fifo_s_get(&referee_fifo);
-   switch(p_obj->unpack_step)
-   {
-     case STEP_HEADER_SOF:
-     {
-       if(byte == sof)
-       {
-         p_obj->unpack_step = STEP_LENGTH_LOW;
-         p_obj->protocol_packet[p_obj->index++] = byte;
-       }
-       else
-       {
-         p_obj->index = 0;
-       }
-     }break;
-     
-     case STEP_LENGTH_LOW:
-     {
-       p_obj->data_len = byte;
-       p_obj->protocol_packet[p_obj->index++] = byte;
-       p_obj->unpack_step = STEP_LENGTH_HIGH;
-     }break;
-     
-     case STEP_LENGTH_HIGH:
-     {
-       p_obj->data_len |= (byte << 8);
-       p_obj->protocol_packet[p_obj->index++] = byte;
+  // If no complete packet was found, return early and skip the rest
+  if (!packetFound)
+  {
+    return;
+  }
 
-       if(p_obj->data_len < (REF_PROTOCOL_FRAME_MAX_SIZE - REF_HEADER_CRC_CMDID_LEN))
-       {
-         p_obj->unpack_step = STEP_FRAME_SEQ;
-       }
-       else
-       {
-         p_obj->unpack_step = STEP_HEADER_SOF;
-         p_obj->index = 0;
-       }
-     }break;
-     case STEP_FRAME_SEQ:
-     {
-       p_obj->protocol_packet[p_obj->index++] = byte;
-       p_obj->unpack_step = STEP_HEADER_CRC8;
-     }break;
+  HexToFloat yaw;
+  HexToFloat pitch;
 
-     case STEP_HEADER_CRC8:
-     {
-       p_obj->protocol_packet[p_obj->index++] = byte;
+  // get Yaw
+  uint32_t temp_Yaw = (uint32_t)packet[3] << 24 |
+                      (uint32_t)packet[4] << 16 |
+                      (uint32_t)packet[5] << 8 |
+                      (uint32_t)packet[6];
+  yaw.hex = temp_Yaw;
+  cv_Data.yaw = yaw.floatValue;
 
-       if (p_obj->index == REF_PROTOCOL_HEADER_SIZE)
-       {
-         if ( verify_CRC8_check_sum(p_obj->protocol_packet, REF_PROTOCOL_HEADER_SIZE) )
-         {
-           p_obj->unpack_step = STEP_DATA_CRC16;
-         }
-         else
-         {
-           p_obj->unpack_step = STEP_HEADER_SOF;
-           p_obj->index = 0;
-         }
-       }
-     }break;  
-     
-     case STEP_DATA_CRC16:
-     {
-       if (p_obj->index < (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
-       {
-          p_obj->protocol_packet[p_obj->index++] = byte;  
-       }
-       if (p_obj->index >= (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
-       {
-         p_obj->unpack_step = STEP_HEADER_SOF;
-         p_obj->index = 0;
+  // get Pitch
+  uint32_t temp_Pitch = (uint32_t)packet[7] << 24 |
+                        (uint32_t)packet[8] << 16 |
+                        (uint32_t)packet[9] << 8 |
+                        (uint32_t)packet[10];
+  pitch.hex = temp_Pitch;
+  cv_Data.pitch = pitch.floatValue;
 
-         if ( verify_CRC16_check_sum(p_obj->protocol_packet, REF_HEADER_CRC_CMDID_LEN + p_obj->data_len) )
-         {
-           referee_data_solve(p_obj->protocol_packet);
-         }
-       }
-     }break;
+  // get Find_Target status
+  cv_Data.find_target = (char)packet[12];
 
-     default:
-     {
-       p_obj->unpack_step = STEP_HEADER_SOF;
-       p_obj->index = 0;
-     }break;
-   }
- }
+  // get the new cv data flag
+  detect_hook(USER_USART_DATA_TOE);
+  cv_Data.new_cv_data_flag = 1;
 }
 
+/**
+ * @brief          single byte upacked
+ * @param[in]      void
+ * @retval         none
+ */
+/**
+ * @brief          闂傚倸鍊搁崐椋庣矆娓氣偓楠炲鏁撻悩顔瑰亾閸愵喖骞㈡俊鐐存�?濡炶棄�?ｆ�?瀣垫晣闁绘�?娓瑰Σ鎰版煟閻斿摜�??俊�?㈠暣閻涱喗绻濋崶銊モ偓鐑芥煕濠靛棗�?柨娑欑矊閳规垿�?��鑲╁姶闂佸憡鎸诲銊╁极椤曗偓閸ㄦ儳鐣烽崶銊︻啎闂備浇娉曢崳锕傚�?閿燂�??
+ * @param[in]      void
+ * @retval         none
+ */
+void referee_unpack_fifo_data(void)
+{
+  uint8_t byte = 0;
+  uint8_t sof = HEADER_SOF;
+  unpack_data_t *p_obj = &referee_unpack_obj;
+
+  while (fifo_s_used(&referee_fifo))
+  {
+    byte = fifo_s_get(&referee_fifo);
+    switch (p_obj->unpack_step)
+    {
+    case STEP_HEADER_SOF:
+    {
+      if (byte == sof)
+      {
+        p_obj->unpack_step = STEP_LENGTH_LOW;
+        p_obj->protocol_packet[p_obj->index++] = byte;
+      }
+      else
+      {
+        p_obj->index = 0;
+      }
+    }
+    break;
+
+    case STEP_LENGTH_LOW:
+    {
+      p_obj->data_len = byte;
+      p_obj->protocol_packet[p_obj->index++] = byte;
+      p_obj->unpack_step = STEP_LENGTH_HIGH;
+    }
+    break;
+
+    case STEP_LENGTH_HIGH:
+    {
+      p_obj->data_len |= (byte << 8);
+      p_obj->protocol_packet[p_obj->index++] = byte;
+
+      if (p_obj->data_len < (REF_PROTOCOL_FRAME_MAX_SIZE - REF_HEADER_CRC_CMDID_LEN))
+      {
+        p_obj->unpack_step = STEP_FRAME_SEQ;
+      }
+      else
+      {
+        p_obj->unpack_step = STEP_HEADER_SOF;
+        p_obj->index = 0;
+      }
+    }
+    break;
+    case STEP_FRAME_SEQ:
+    {
+      p_obj->protocol_packet[p_obj->index++] = byte;
+      p_obj->unpack_step = STEP_HEADER_CRC8;
+    }
+    break;
+
+    case STEP_HEADER_CRC8:
+    {
+      p_obj->protocol_packet[p_obj->index++] = byte;
+
+      if (p_obj->index == REF_PROTOCOL_HEADER_SIZE)
+      {
+        if (verify_CRC8_check_sum(p_obj->protocol_packet, REF_PROTOCOL_HEADER_SIZE))
+        {
+          p_obj->unpack_step = STEP_DATA_CRC16;
+        }
+        else
+        {
+          p_obj->unpack_step = STEP_HEADER_SOF;
+          p_obj->index = 0;
+        }
+      }
+    }
+    break;
+
+    case STEP_DATA_CRC16:
+    {
+      if (p_obj->index < (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
+      {
+        p_obj->protocol_packet[p_obj->index++] = byte;
+      }
+      if (p_obj->index >= (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
+      {
+        p_obj->unpack_step = STEP_HEADER_SOF;
+        p_obj->index = 0;
+
+        if (verify_CRC16_check_sum(p_obj->protocol_packet, REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
+        {
+          referee_data_solve(p_obj->protocol_packet);
+        }
+      }
+    }
+    break;
+
+    default:
+    {
+      p_obj->unpack_step = STEP_HEADER_SOF;
+      p_obj->index = 0;
+    }
+    break;
+    }
+  }
+}
 
 void USART6_IRQHandler(void)
 {
-   static volatile uint8_t res;
-   if(USART6->SR & UART_FLAG_IDLE)
-   {
-       __HAL_UART_CLEAR_PEFLAG(&huart6);
+  static volatile uint8_t res;
+  if (USART6->SR & UART_FLAG_IDLE)
+  {
+    __HAL_UART_CLEAR_PEFLAG(&huart6);
 
-       static uint16_t this_time_rx_len = 0;
+    static uint16_t this_time_rx_len = 0;
 
-       if ((huart6.hdmarx->Instance->CR & DMA_SxCR_CT) == RESET)
-       {
-           __HAL_DMA_DISABLE(huart6.hdmarx);
-           this_time_rx_len = USART_RX_BUF_LENGHT - __HAL_DMA_GET_COUNTER(huart6.hdmarx);
-           __HAL_DMA_SET_COUNTER(huart6.hdmarx, USART_RX_BUF_LENGHT);
-           huart6.hdmarx->Instance->CR |= DMA_SxCR_CT;
-           __HAL_DMA_ENABLE(huart6.hdmarx);
-           fifo_s_puts(&referee_fifo, (char*)usart6_buf[0], this_time_rx_len);
-           detect_hook(REFEREE_TOE);
-       }
-       else
-       {
-           __HAL_DMA_DISABLE(huart6.hdmarx);
-           this_time_rx_len = USART_RX_BUF_LENGHT - __HAL_DMA_GET_COUNTER(huart6.hdmarx);
-           __HAL_DMA_SET_COUNTER(huart6.hdmarx, USART_RX_BUF_LENGHT);
-           huart6.hdmarx->Instance->CR &= ~(DMA_SxCR_CT);
-           __HAL_DMA_ENABLE(huart6.hdmarx);
-           fifo_s_puts(&referee_fifo, (char*)usart6_buf[1], this_time_rx_len);
-           detect_hook(REFEREE_TOE);
-       }
-   }
+    if ((huart6.hdmarx->Instance->CR & DMA_SxCR_CT) == RESET)
+    {
+      __HAL_DMA_DISABLE(huart6.hdmarx);
+      this_time_rx_len = USART_RX_BUF_LENGHT - __HAL_DMA_GET_COUNTER(huart6.hdmarx);
+      __HAL_DMA_SET_COUNTER(huart6.hdmarx, USART_RX_BUF_LENGHT);
+      huart6.hdmarx->Instance->CR |= DMA_SxCR_CT;
+      __HAL_DMA_ENABLE(huart6.hdmarx);
+      fifo_s_puts(&referee_fifo, (char *)usart6_buf[0], this_time_rx_len);
+      detect_hook(REFEREE_TOE);
+    }
+    else
+    {
+      __HAL_DMA_DISABLE(huart6.hdmarx);
+      this_time_rx_len = USART_RX_BUF_LENGHT - __HAL_DMA_GET_COUNTER(huart6.hdmarx);
+      __HAL_DMA_SET_COUNTER(huart6.hdmarx, USART_RX_BUF_LENGHT);
+      huart6.hdmarx->Instance->CR &= ~(DMA_SxCR_CT);
+      __HAL_DMA_ENABLE(huart6.hdmarx);
+      fifo_s_puts(&referee_fifo, (char *)usart6_buf[1], this_time_rx_len);
+      detect_hook(REFEREE_TOE);
+    }
+  }
 }
-
-

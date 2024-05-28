@@ -20,29 +20,27 @@
 #define VOLTAGE_TASK_H
 #include "struct_typedef.h"
 
-
-
 /**
-  * @brief          power ADC and calculate electricity percentage
-  * @param[in]      pvParameters: NULL
-  * @retval         none
-  */
+ * @brief          power ADC and calculate electricity percentage
+ * @param[in]      pvParameters: NULL
+ * @retval         none
+ */
 /**
-  * @brief          电源采样和计算电源百分比
-  * @param[in]      pvParameters: NULL
-  * @retval         none
-  */
-extern void battery_voltage_task(void const * argument);
+ * @brief          电源采样和计算电源百分比
+ * @param[in]      pvParameters: NULL
+ * @retval         none
+ */
+extern void battery_voltage_task(void const *argument);
 
 /**
-  * @brief          get electricity percentage
-  * @param[in]      void
-  * @retval         electricity percentage, unit 1, 1 = 1%
-  */
+ * @brief          get electricity percentage
+ * @param[in]      void
+ * @retval         electricity percentage, unit 1, 1 = 1%
+ */
 /**
-  * @brief          获取电量
-  * @param[in]      void
-  * @retval         电量, 单位 1, 1 = 1%
-  */
+ * @brief          获取电量
+ * @param[in]      void
+ * @retval         电量, 单位 1, 1 = 1%
+ */
 extern uint16_t get_battery_percentage(void);
 #endif
