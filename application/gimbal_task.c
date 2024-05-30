@@ -849,15 +849,6 @@ static void gimbal_set_control(gimbal_control_t *set_control)
   static float auto_yaw_target = 0.0f;
   static float auto_pitch_target = 0.0f;
 
-  // Receive gimbal control from remote control
-  // gimbal_behaviour_control_set(&add_yaw_angle, &add_pitch_angle, set_control);
-
-  // add_yaw_angle = cv_Data.yaw;
-  // add_pitch_angle = -0.1*cv_Data.pitch;
-
-  // add_yaw_angle = KalmanFilter(add_yaw_angle, &kf_yaw);
-  // add_pitch_angle = KalmanFilter(add_pitch_angle, &kf_pitch);
-
   if (gimbal_behaviour == GIMBAL_AUTO)
   {
     // If the data is not received, the target angle is set to the current angle
@@ -1115,8 +1106,14 @@ static void gimbal_motor_relative_angle_control(gimbal_motor_t *gimbal_motor)
   }
 
   // 角度环，速度环串级pid调试
-  gimbal_motor->motor_gyro_set = gimbal_PID_calc(&gimbal_motor->gimbal_motor_relative_angle_pid, gimbal_motor->relative_angle, gimbal_motor->relative_angle_set, gimbal_motor->motor_gyro);
-  gimbal_motor->current_set = PID_calc(&gimbal_motor->gimbal_motor_gyro_pid, gimbal_motor->motor_gyro, gimbal_motor->motor_gyro_set);
+  gimbal_motor->motor_gyro_set = gimbal_PID_calc(&gimbal_motor->gimbal_motor_relative_angle_pid,
+                                                 gimbal_motor->relative_angle,
+                                                 gimbal_motor->relative_angle_set,
+                                                 gimbal_motor->motor_gyro);
+                                                 
+  gimbal_motor->current_set = PID_calc(&gimbal_motor->gimbal_motor_gyro_pid,
+                                       gimbal_motor->motor_gyro,
+                                       gimbal_motor->motor_gyro_set);
   // 控制值赋值
   gimbal_motor->given_current = (int16_t)(gimbal_motor->current_set);
 }
