@@ -532,10 +532,7 @@ static void gimbal_behavour_set(gimbal_control_t *gimbal_mode_set)
     {
         gimbal_behaviour = GIMBAL_ZERO_FORCE;
     }
-    else if (switch_is_mid(gimbal_mode_set->gimbal_rc_ctrl->rc.s[GIMBAL_MODE_CHANNEL]))
-    {
-        gimbal_behaviour = GIMBAL_AUTO;
-    }
+     
     else if (switch_is_up(gimbal_mode_set->gimbal_rc_ctrl->rc.s[GIMBAL_MODE_CHANNEL]))
     {
         gimbal_behaviour = GIMBAL_ABSOLUTE_ANGLE;
@@ -856,9 +853,6 @@ static void gimbal_auto_control(float *yaw, float *pitch, gimbal_control_t *gimb
 
     static float auto_yaw;
     static float auto_pitch;
-
-    // 向上位机发送姿态数据
-    //  gimbal_data_send();
 
     if (cv_Data.new_cv_data_flag == 1)
     {
