@@ -1023,13 +1023,7 @@ static void gimbal_control_loop(gimbal_control_t *control_loop)
   }
   else if (control_loop->gimbal_yaw_motor.gimbal_motor_mode == GIMBAL_MOTOR_ENCONDE)
   {
-
-    // 角速度 pid
-    control_loop->gimbal_yaw_motor.motor_gyro_set = gimbal_PID_calc(&control_loop->gimbal_yaw_motor.gimbal_motor_absolute_angle_pid, cv_Data.yaw, 0, control_loop->gimbal_yaw_motor.motor_gyro);
-    // 速度环 pid： gimbal_motor_gyro_pid
-    control_loop->gimbal_yaw_motor.current_set = PID_calc(&control_loop->gimbal_yaw_motor.gimbal_motor_gyro_pid, control_loop->gimbal_yaw_motor.motor_gyro, control_loop->gimbal_yaw_motor.motor_gyro_set);
-    // 控制值赋值
-    control_loop->gimbal_yaw_motor.given_current = (int16_t)(control_loop->gimbal_yaw_motor.current_set);
+    gimbal_motor_relative_angle_control(&control_loop->gimbal_yaw_motor);
   }
 
   // pitch motor control
@@ -1060,16 +1054,7 @@ static void gimbal_control_loop(gimbal_control_t *control_loop)
   }
   else if (control_loop->gimbal_pitch_motor.gimbal_motor_mode == GIMBAL_MOTOR_ENCONDE)
   {
-    // 角度 pid
-    control_loop->gimbal_pitch_motor.motor_gyro_set = gimbal_PID_calc(&control_loop->gimbal_pitch_motor.gimbal_motor_absolute_angle_pid,
-                                                                      control_loop->gimbal_pitch_motor.absolute_angle,
-                                                                      control_loop->gimbal_pitch_motor.absolute_angle + cv_Data.pitch, control_loop->gimbal_pitch_motor.motor_gyro);
-    // 速度环 pid： gimbal_motor_gyro_pid
-    control_loop->gimbal_pitch_motor.current_set = PID_calc(&control_loop->gimbal_pitch_motor.gimbal_motor_gyro_pid,
-                                                            control_loop->gimbal_pitch_motor.motor_gyro,
-                                                            control_loop->gimbal_pitch_motor.motor_gyro_set);
-    // 控制值赋值
-    control_loop->gimbal_pitch_motor.given_current = -(int16_t)control_loop->gimbal_pitch_motor.current_set;
+    gimbal_motor_relative_angle_control(&control_loop->gimbal_pitch_motor);
   }
 }
 
