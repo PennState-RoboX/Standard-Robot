@@ -310,6 +310,7 @@ static int16_t pitch_current_set = 0;
 static fp32 pitch_speed_pid_POUT = 0;
 static fp32 pitch_speed_pid_IOUT = 0;
 static fp32 pitch_speed_pid_DOUT = 0;
+static fp32 pitch_gyro_diff = 0;
 
 /**************************************************/
 
@@ -736,6 +737,7 @@ static void gimbal_feedback_update(gimbal_control_t *feedback_update)
 #endif
 
   feedback_update->gimbal_pitch_motor.motor_gyro = *(feedback_update->gimbal_INT_gyro_point + INS_GYRO_Y_ADDRESS_OFFSET);
+  pitch_gyro_diff = feedback_update->gimbal_pitch_motor.motor_gyro - feedback_update->gimbal_pitch_motor.motor_gyro_set;
 
   feedback_update->gimbal_yaw_motor.absolute_angle = *(feedback_update->gimbal_INT_angle_point + INS_YAW_ADDRESS_OFFSET);
 
