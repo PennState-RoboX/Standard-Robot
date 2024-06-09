@@ -464,7 +464,7 @@ static void chassis_infantry_follow_gimbal_yaw_control(fp32 *vx_set, fp32 *vy_se
 
   // judge if swing
   // ÅÐ¶ÏÊÇ·ñÒªÒ¡°Ú
-  if ((chassis_move_rc_to_vector->chassis_RC->key.v & SWING_KEY) || (switch_is_up(chassis_move_rc_to_vector->chassis_RC->rc.s[CHASSIS_MODE_CHANNEL])))
+  if (chassis_move_rc_to_vector->chassis_RC->key.v & SWING_KEY)
   {
     if (swing_flag == 0)
     {
