@@ -18,7 +18,7 @@
   */
 #include "chassis_task.h"
 #include "chassis_behaviour.h"
-
+#include <stdlib.h>
 #include "cmsis_os.h"
 
 #include "arm_math.h"
@@ -151,10 +151,11 @@ void chassis_task(void const *pvParameters)
   chassis_init(&chassis_move);
   // make sure all chassis motor is online,
   // 判断底盘电机是否都在线
-  while (toe_is_error(CHASSIS_MOTOR1_TOE) || toe_is_error(CHASSIS_MOTOR2_TOE) || toe_is_error(CHASSIS_MOTOR3_TOE) || toe_is_error(CHASSIS_MOTOR4_TOE) || toe_is_error(DBUS_TOE))
-  {
-    vTaskDelay(CHASSIS_CONTROL_TIME_MS);
-  }
+
+  // while (toe_is_error(CHASSIS_MOTOR1_TOE) || toe_is_error(CHASSIS_MOTOR2_TOE) || toe_is_error(CHASSIS_MOTOR3_TOE) || toe_is_error(CHASSIS_MOTOR4_TOE) || toe_is_error(DBUS_TOE))
+  //{
+  // vTaskDelay(CHASSIS_CONTROL_TIME_MS);
+  //}
 
   while (1)
   {
@@ -488,13 +489,21 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control)
     chassis_move_control->chassis_relative_angle_set = rad_format(angle_set);
     // calculate ratation speed
     // 计算旋转PID角速度
-    //  chassis_move_control->wz_set = -PID_calc(&chassis_move_control->chassis_angle_pid, chassis_move_control->chassis_yaw_motor->relative_angle, chassis_move_control->chassis_relative_angle_set);
-    chassis_move_control->wz_set = 2.0f;
+    if (chassis_move_control->chassis_RC->key.v & Rotation_On_Keyborad)
+    {
+      // 产生[0.5, 5]范围内的随机数作为wz_set
+      chassis_move_control->wz_set = (float)(rand() % 9) / 1.0f;
+    }
+    else
+    {
+      chassis_move_control->wz_set = -PID_calc(&chassis_move_control->chassis_angle_pid, chassis_move_control->chassis_yaw_motor->relative_angle, chassis_move_control->chassis_relative_angle_set);
+    }
     // speed limit
     // 速度限幅
     chassis_move_control->vx_set = fp32_constrain(chassis_move_control->vx_set, chassis_move_control->vx_min_speed, chassis_move_control->vx_max_speed);
     chassis_move_control->vy_set = fp32_constrain(chassis_move_control->vy_set, chassis_move_control->vy_min_speed, chassis_move_control->vy_max_speed);
   }
+  
   else if (chassis_move_control->chassis_mode == CHASSIS_VECTOR_FOLLOW_CHASSIS_YAW)
   {
     fp32 delat_angle = 0.0f;
