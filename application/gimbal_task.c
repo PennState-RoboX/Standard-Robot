@@ -416,7 +416,7 @@ void set_cali_gimbal_hook(const uint16_t yaw_offset, const uint16_t pitch_offset
 {
   // Original:
   // gimbal_control.gimbal_yaw_motor.offset_ecd = yaw_offset;
-  gimbal_control.gimbal_yaw_motor.offset_ecd = 0x058d;
+  gimbal_control.gimbal_yaw_motor.offset_ecd = 7100;
   gimbal_control.gimbal_yaw_motor.max_relative_angle = max_yaw;
   gimbal_control.gimbal_yaw_motor.min_relative_angle = min_yaw;
 
