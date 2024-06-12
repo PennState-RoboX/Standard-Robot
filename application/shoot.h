@@ -82,6 +82,14 @@
 
 #define SHOOT_HEAT_REMAIN_VALUE 80
 
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
 typedef enum
 {
   SHOOT_STOP = 0,
@@ -134,4 +142,7 @@ typedef struct
 extern void shoot_init(void);
 extern int16_t shoot_control_loop(void);
 
+extern void door_open(void);
+extern void door_close(void);
+extern void door_stop(void);
 #endif
