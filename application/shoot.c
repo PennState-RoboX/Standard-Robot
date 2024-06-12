@@ -67,6 +67,9 @@ static void trigger_motor_turn_back(void);
  */
 static void shoot_bullet_control(void);
 
+void door_control(void);
+
+
 shoot_control_t shoot_control; // 射击数据
 
 /**
@@ -111,6 +114,7 @@ int16_t shoot_control_loop(void)
 
     shoot_set_mode();        // 设置状态机
     shoot_feedback_update(); // 更新数据
+    door_control();
 
     if (shoot_control.shoot_mode == SHOOT_STOP)
     {
@@ -462,5 +466,41 @@ static void shoot_bullet_control(void)
     else
     {
         shoot_control.move_flag = 0;
+    }
+}
+
+static bool_t door_motor_on = FALSE;
+static bool_t last_status = FALSE;
+static uint32_t door_move_start_time = 0;
+static uint32_t door_move_duration = 1000;
+
+static void door_control(void)
+{
+
+    if (switch_is_up(shoot_control.shoot_rc->rc.s[0]))
+    {
+        if (door_motor_on == FALSE)
+        {
+            door_move_start_time = HAL_GetTick(); // 记录开始移动的时间
+            door_open();
+            door_motor_on = TRUE;
+        }
+    }
+
+    else if(switch_is_mid(shoot_control.shoot_rc->rc.s[0]))
+    {
+        if (door_motor_on == FALSE)
+        {
+            door_move_start_time = HAL_GetTick(); // 记录开始移动的时间
+            door_close();
+            door_motor_on = TRUE;
+        }
+    }
+
+    // 检查是否达到目标时间
+    if (door_motor_on && (HAL_GetTick() - door_move_start_time >= door_move_duration))
+    {
+        door_stop();
+        door_motor_on = FALSE;
     }
 }
