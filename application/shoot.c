@@ -69,7 +69,6 @@ static void shoot_bullet_control(void);
 
 void door_control(void);
 
-
 shoot_control_t shoot_control; // 射击数据
 
 /**
@@ -477,23 +476,32 @@ static uint32_t door_move_duration = 1000;
 static void door_control(void)
 {
 
-    if (switch_is_up(shoot_control.shoot_rc->rc.s[0]))
+    if ((shoot_control.shoot_rc->key.v & HATCH_OPEN))
     {
-        if (door_motor_on == FALSE)
+
+        if (last_status == FALSE)
         {
-            door_move_start_time = HAL_GetTick(); // 记录开始移动的时间
-            door_open();
-            door_motor_on = TRUE;
+            if (door_motor_on == FALSE)
+            {
+                door_move_start_time = HAL_GetTick(); // 记录开始移动的时间
+                door_motor_on = TRUE;
+                door_open();
+                last_status = TRUE;
+            }
         }
     }
 
-    else if(switch_is_mid(shoot_control.shoot_rc->rc.s[0]))
+    else if ((shoot_control.shoot_rc->key.v & HATCH_CLOSE))
     {
-        if (door_motor_on == FALSE)
+        if (last_status == TRUE)
         {
-            door_move_start_time = HAL_GetTick(); // 记录开始移动的时间
-            door_close();
-            door_motor_on = TRUE;
+            if (door_motor_on == FALSE)
+            {
+                door_move_start_time = HAL_GetTick(); // 记录开始移动的时间
+                door_motor_on = TRUE;
+                door_close();
+                last_status = FALSE;
+            }
         }
     }
 
