@@ -36,6 +36,11 @@
 #define SHOOT_ON_KEYBOARD KEY_PRESSED_OFFSET_Q
 #define SHOOT_OFF_KEYBOARD KEY_PRESSED_OFFSET_E
 
+// hatch open/close
+#define HATCH_OPEN KEY_PRESSED_OFFSET_Z
+#define HATCH_CLOSE KEY_PRESSED_OFFSET_X
+
+
 // 射击完成后 子弹弹出去后，判断时间，以防误触发
 #define SHOOT_DONE_KEY_OFF_TIME 15
 // 鼠标长按判断

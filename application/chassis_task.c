@@ -489,15 +489,9 @@ static void chassis_set_contorl(chassis_move_t *chassis_move_control)
     chassis_move_control->chassis_relative_angle_set = rad_format(angle_set);
     // calculate ratation speed
     // 计算旋转PID角速度
-    if (chassis_move_control->chassis_RC->key.v & Rotation_On_Keyborad)
-    {
-      // 产生[0.5, 5]范围内的随机数作为wz_set
-      chassis_move_control->wz_set = (float)(rand() % 9) / 1.0f;
-    }
-    else
-    {
-      chassis_move_control->wz_set = -PID_calc(&chassis_move_control->chassis_angle_pid, chassis_move_control->chassis_yaw_motor->relative_angle, chassis_move_control->chassis_relative_angle_set);
-    }
+
+    chassis_move_control->wz_set = 2.0f;
+
     // speed limit
     // 速度限幅
     chassis_move_control->vx_set = fp32_constrain(chassis_move_control->vx_set, chassis_move_control->vx_min_speed, chassis_move_control->vx_max_speed);

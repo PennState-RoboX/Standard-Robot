@@ -477,7 +477,7 @@ static uint32_t door_move_duration = 1000;
 static void door_control(void)
 {
 
-    if (switch_is_up(shoot_control.shoot_rc->rc.s[0]))
+    if ((shoot_control.shoot_rc->key.v & HATCH_OPEN))
     {
         if (door_motor_on == FALSE)
         {
@@ -487,7 +487,7 @@ static void door_control(void)
         }
     }
 
-    else if(switch_is_mid(shoot_control.shoot_rc->rc.s[0]))
+    else if ((shoot_control.shoot_rc->key.v & HATCH_CLOSE))
     {
         if (door_motor_on == FALSE)
         {
